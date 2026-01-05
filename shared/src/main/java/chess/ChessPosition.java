@@ -33,6 +33,9 @@ public class ChessPosition {
         return column;
     }
 
+/*
+//    Created Overrides for equals, hashCode, and toString
+*/
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
