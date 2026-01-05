@@ -101,4 +101,27 @@ public class ChessPiece {
 //        }
         return moves;
     }
+    // Piece Moves
+
+    // Knight
+    private void addKnightMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
+        int[][] knightOffsets = {
+                {2, 1},   // 2 up, 1 right
+                {2, -1},  // 2 up, 1 left
+                {-2, 1},  // 2 down, 1 right
+                {-2, -1}, // 2 down, 1 left
+                {1, 2},   // 1 up, 2 right
+                {1, -2},  // 1 up, 2 left
+                {-1, 2},  // 1 down, 2 right
+                {-1, -2}  // 1 down, 2 left
+        };
+
+        for (int[] offset : knightOffsets) {
+            int newRow = myPosition.getRow() + offset[0];
+            int newColumn = myPosition.getColumn() + offset[1];
+
+            // Check if new position is valid
+            // Check if a move to new position is possible
+        }
+    }
 }
