@@ -110,8 +110,7 @@ public class ChessPiece {
         return pieceAtPosition == null || pieceAtPosition.getTeamColor() != this.pieceColor;
     }
 
-    private void addSlidingMoves(ChessBoard board, ChessPosition myPosition,
-                                 Collection<ChessMove> moves, int rowDir, int colDir) {
+    private void addSlidingMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int rowDir, int colDir) {
         int currentRow = myPosition.getRow() + rowDir;
         int currentCol = myPosition.getColumn() + colDir;
 
@@ -131,16 +130,13 @@ public class ChessPiece {
                 break;
             }
 
-            // Move to next square in this direction
+            // Move to next square
             currentRow += rowDir;
             currentCol += colDir;
         }
     }
 
-
-
     // Piece Moves
-
     // Knight
     private void addKnightMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
         int[][] knightOffsets = {
@@ -159,6 +155,33 @@ public class ChessPiece {
             int newColumn = myPosition.getColumn() + offset[1];
 
             // Check if new position is
+            // Check if a move to new position is possible
+            if (isValidPosition(newRow, newColumn)) {
+                ChessPosition newPosition = new ChessPosition(newRow, newColumn);
+                if (canMoveto(board, newPosition)) {
+                    moves.add(new ChessMove(myPosition, newPosition, null));
+                }
+            }
+        }
+    }
+    // King
+    private void addKingMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
+        int[][] kingOffsets = {
+                {1, 0},   // up
+                {1, 1},   // up-right
+                {0, 1},   // right
+                {-1, 1},  // down-right
+                {-1, 0},  // down
+                {-1, -1}, // down-left
+                {0, -1},  // left
+                {1, -1}   // up-left
+        };
+
+        for (int[] offset : kingOffsets) {
+            int newRow = myPosition.getRow() + offset[0];
+            int newColumn = myPosition.getColumn() + offset[1];
+
+            // Check if new position is valid
             // Check if a move to new position is possible
             if (isValidPosition(newRow, newColumn)) {
                 ChessPosition newPosition = new ChessPosition(newRow, newColumn);
@@ -204,7 +227,6 @@ public class ChessPiece {
             if (board.getPiece(forwardPosition) == null) {
                 // Check for promotion
                 if (forwardRow == promotionRow) {
-                    // Add all promotion options
                     moves.add(new ChessMove(myPosition, forwardPosition, PieceType.QUEEN));
                     moves.add(new ChessMove(myPosition, forwardPosition, PieceType.ROOK));
                     moves.add(new ChessMove(myPosition, forwardPosition, PieceType.BISHOP));
@@ -213,7 +235,7 @@ public class ChessPiece {
                     moves.add(new ChessMove(myPosition, forwardPosition, null));
                 }
 
-                // Forward two squares (only from starting position)
+                // Forward two squares
                 if (myPosition.getRow() == startRow) {
                     int doubleForwardRow = myPosition.getRow() + (2 * direction);
                     ChessPosition doubleForwardPosition = new ChessPosition(doubleForwardRow, forwardCol);
@@ -226,7 +248,7 @@ public class ChessPiece {
             }
         }
 
-        // Diagonal captures (left and right)
+        // Diagonal captures
         int[] captureColumns = {myPosition.getColumn() - 1, myPosition.getColumn() + 1};
 
         for (int captureCol : captureColumns) {
@@ -245,34 +267,6 @@ public class ChessPiece {
                     } else {
                         moves.add(new ChessMove(myPosition, capturePosition, null));
                     }
-                }
-            }
-        }
-    }
-
-    // King
-    private void addKingMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
-        int[][] kingOffsets = {
-                {1, 0},   // up
-                {1, 1},   // up-right
-                {0, 1},   // right
-                {-1, 1},  // down-right
-                {-1, 0},  // down
-                {-1, -1}, // down-left
-                {0, -1},  // left
-                {1, -1}   // up-left
-        };
-
-        for (int[] offset : kingOffsets) {
-            int newRow = myPosition.getRow() + offset[0];
-            int newColumn = myPosition.getColumn() + offset[1];
-
-            // Check if new position is valid
-            // Check if a move to new position is possible
-            if (isValidPosition(newRow, newColumn)) {
-                ChessPosition newPosition = new ChessPosition(newRow, newColumn);
-                if (canMoveto(board, newPosition)) {
-                    moves.add(new ChessMove(myPosition, newPosition, null));
                 }
             }
         }
