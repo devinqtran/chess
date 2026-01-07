@@ -49,25 +49,6 @@ public class ChessPiece {
         return type;
     }
 
-    // Overrides
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessPiece that = (ChessPiece) o;
-        return pieceColor == that.pieceColor && type == that.type;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(pieceColor, type);
-    }
-
-    @Override
-    public String toString() {
-        return pieceColor + " " + type;
-    }
-
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -104,7 +85,7 @@ public class ChessPiece {
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
 
-    // Method to determine if the position is empty or has an enemy piece
+    // Check if position is empty
     private boolean canMoveto(ChessBoard board, ChessPosition position) {
         ChessPiece pieceAtPosition = board.getPiece(position);
         return pieceAtPosition == null || pieceAtPosition.getTeamColor() != this.pieceColor;
@@ -117,16 +98,15 @@ public class ChessPiece {
         while (isValidPosition(currentRow, currentCol)) {
             ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
             ChessPiece pieceAtPosition = board.getPiece(newPosition);
-
             if (pieceAtPosition == null) {
-                // Empty square - can move here and continue
+                // Empty square
                 moves.add(new ChessMove(myPosition, newPosition, null));
             } else if (pieceAtPosition.getTeamColor() != this.pieceColor) {
-                // Enemy piece - can capture but must stop
+                // Enemy piece
                 moves.add(new ChessMove(myPosition, newPosition, null));
                 break;
             } else {
-                // Friendly piece - blocked, stop
+                // Blocked
                 break;
             }
 
@@ -149,13 +129,9 @@ public class ChessPiece {
                 {-1, 2},  // 1 down, 2 right
                 {-1, -2}  // 1 down, 2 left
         };
-
         for (int[] offset : knightOffsets) {
             int newRow = myPosition.getRow() + offset[0];
             int newColumn = myPosition.getColumn() + offset[1];
-
-            // Check if new position is
-            // Check if a move to new position is possible
             if (isValidPosition(newRow, newColumn)) {
                 ChessPosition newPosition = new ChessPosition(newRow, newColumn);
                 if (canMoveto(board, newPosition)) {
@@ -176,13 +152,9 @@ public class ChessPiece {
                 {0, -1},  // left
                 {1, -1}   // up-left
         };
-
         for (int[] offset : kingOffsets) {
             int newRow = myPosition.getRow() + offset[0];
             int newColumn = myPosition.getColumn() + offset[1];
-
-            // Check if new position is valid
-            // Check if a move to new position is possible
             if (isValidPosition(newRow, newColumn)) {
                 ChessPosition newPosition = new ChessPosition(newRow, newColumn);
                 if (canMoveto(board, newPosition)) {
@@ -222,10 +194,8 @@ public class ChessPiece {
 
         if (isValidPosition(forwardRow, forwardCol)) {
             ChessPosition forwardPosition = new ChessPosition(forwardRow, forwardCol);
-
-            // Can only move forward if square is empty
             if (board.getPiece(forwardPosition) == null) {
-                // Check for promotion
+                //  Promotion
                 if (forwardRow == promotionRow) {
                     moves.add(new ChessMove(myPosition, forwardPosition, PieceType.QUEEN));
                     moves.add(new ChessMove(myPosition, forwardPosition, PieceType.ROOK));
@@ -239,8 +209,6 @@ public class ChessPiece {
                 if (myPosition.getRow() == startRow) {
                     int doubleForwardRow = myPosition.getRow() + (2 * direction);
                     ChessPosition doubleForwardPosition = new ChessPosition(doubleForwardRow, forwardCol);
-
-                    // Both squares must be empty
                     if (board.getPiece(doubleForwardPosition) == null) {
                         moves.add(new ChessMove(myPosition, doubleForwardPosition, null));
                     }
@@ -256,7 +224,7 @@ public class ChessPiece {
                 ChessPosition capturePosition = new ChessPosition(forwardRow, captureCol);
                 ChessPiece pieceAtCapture = board.getPiece(capturePosition);
 
-                // Can only capture diagonally if there's an enemy piece
+                // Check for enemy piece
                 if (pieceAtCapture != null && pieceAtCapture.getTeamColor() != this.pieceColor) {
                     // Check for promotion
                     if (forwardRow == promotionRow) {
@@ -270,5 +238,22 @@ public class ChessPiece {
                 }
             }
         }
+    }
+
+    // Overrides
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
+    @Override
+    public String toString() {
+        return pieceColor + " " + type;
     }
 }
