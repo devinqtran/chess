@@ -44,12 +44,10 @@ public class ChessPosition {
         if (row != that.row) return false;
         return column == that.column;
     }
-
     @Override
     public int hashCode() {
         return Objects.hash(row, column);
     }
-
     @Override
     public String toString() {
         return "(" + row + ", " + column + ")";

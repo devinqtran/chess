@@ -62,7 +62,11 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return startPosition + " -> " + endPosition +
-                (promotionPiece != null ? " (promote to " + promotionPiece + ")" : "");
+        final StringBuilder sb = new StringBuilder("ChessMove{");
+        sb.append("startPosition=").append(startPosition);
+        sb.append(", endPosition=").append(endPosition);
+        sb.append(", promotionPiece=").append(promotionPiece);
+        sb.append('}');
+        return sb.toString();
     }
 }

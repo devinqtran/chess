@@ -73,7 +73,7 @@ public class ChessBoard {
         addPiece(new ChessPosition(8, 7), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
         addPiece(new ChessPosition(8, 8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
 
-        // Row 7: Black pawns
+        // Black pawns
         for (int col = 1; col <= 8; col++) {
             addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
@@ -85,30 +85,15 @@ public class ChessBoard {
         ChessBoard that = (ChessBoard) o;
         return Arrays.deepEquals(squares, that.squares);
     }
-
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(squares);
     }
-
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        // Print from row 8 down to row 1 (top to bottom visually)
-        for (int row = 7; row >= 0; row--) {
-            for (int col = 0; col < 8; col++) {
-                if (squares[row][col] == null) {
-                    sb.append("- ");
-                } else {
-                    ChessPiece piece = squares[row][col];
-                    // Simple representation: first letter of color + piece type
-                    char colorChar = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 'W' : 'B';
-                    char pieceChar = piece.getPieceType().toString().charAt(0);
-                    sb.append(colorChar).append(pieceChar).append(" ");
-                }
-            }
-            sb.append("\n");
-        }
+        final StringBuilder sb = new StringBuilder("ChessBoard{");
+        sb.append("squares=").append(Arrays.toString(squares));
+        sb.append('}');
         return sb.toString();
     }
 }
