@@ -85,7 +85,11 @@ public class ChessPiece {
         switch (type) {
             // Calls individual piece methods to add moves for that type
             case KING: addKingMoves(board, myPosition, moves); break;
-            case KNIGHT: addKnightMoves(board, myPosition, moves);
+            case KNIGHT: addKnightMoves(board, myPosition, moves); break;
+            case QUEEN: addQueenMoves(board, myPosition, moves); break;
+            case BISHOP: addBishopMoves(board, myPosition, moves); break;
+            case ROOK: addRookMoves(board, myPosition, moves); break;
+            case PAWN: addPawnMoves(board, myPosition, moves); break;
         }
         // Returns the collection of all valid moves
         return moves;
@@ -177,7 +181,7 @@ public class ChessPiece {
         addSlidingMoves(board, myPosition, moves, 1, 0);
         addSlidingMoves(board, myPosition, moves, 0, 1);
         addSlidingMoves(board, myPosition, moves, 0, -1);
-        addSlidingMoves(board, myPosition, moves, 1, -1);
+        addSlidingMoves(board, myPosition, moves, -1, 0);
     }
     private void addQueenMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
         addRookMoves(board, myPosition, moves);
@@ -195,22 +199,24 @@ public class ChessPiece {
             ChessPosition forwardPosition = new ChessPosition(forwardRow, forwardCol);
             // Sets possible promotion pieces
             if (board.getPiece(forwardPosition) == null) {
-                moves.add(new ChessMove(myPosition, forwardPosition, PieceType.QUEEN));
-                moves.add(new ChessMove(myPosition, forwardPosition, PieceType.ROOK));
-                moves.add(new ChessMove(myPosition, forwardPosition, PieceType.BISHOP));
-                moves.add(new ChessMove(myPosition, forwardPosition, PieceType.KNIGHT));
-            } else {
-                // Or add a regular move
-                moves.add(new ChessMove(myPosition, forwardPosition, null));
+                if (forwardRow == promotionRow) {
+                    // Add promotion moves
+                    moves.add(new ChessMove(myPosition, forwardPosition, PieceType.QUEEN));
+                    moves.add(new ChessMove(myPosition, forwardPosition, PieceType.ROOK));
+                    moves.add(new ChessMove(myPosition, forwardPosition, PieceType.BISHOP));
+                    moves.add(new ChessMove(myPosition, forwardPosition, PieceType.KNIGHT));
+                } else {
+                    // Regular forward move
+                    moves.add(new ChessMove(myPosition, forwardPosition, null));
+                }
             }
 
             // Double movement for pawn
             if (myPosition.getRow() == startRow) {
-                // If pawn is in starting row, double forward movement in direction is calculated
                 int doubleForwardRow = myPosition.getRow() + (2 * direction);
                 ChessPosition doubleForwardPosition = new ChessPosition(doubleForwardRow, forwardCol);
-                // Check to see if both positions are empty
-                if (board.getPiece(doubleForwardPosition) == null) {
+                // Check two forward positions are empty
+                if (board.getPiece(forwardPosition) == null && board.getPiece(doubleForwardPosition) == null) {
                     moves.add(new ChessMove(myPosition, doubleForwardPosition, null));
                 }
             }
