@@ -9,11 +9,28 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard {
+public class ChessBoard implements Cloneable {
     private ChessPiece[][] squares;
 
     public ChessBoard() {
         squares = new ChessPiece[8][8];
+    }
+
+    /**
+     * Copy constructor for ChessGame
+     */
+    public ChessBoard(ChessBoard copy) {
+        this.squares = new ChessPiece[8][8];
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = copy.squares[row][col];
+                if (piece != null) {
+                    this.squares[row][col] = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
+                } else {
+                    this.squares[row][col] = null;
+                }
+            }
+        }
     }
 
     /**
@@ -77,6 +94,25 @@ public class ChessBoard {
         for (int col = 1; col <= 8; col++) {
             addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
+    }
+    /**
+     * Helper method for cloning board
+     */
+    @Override
+    public ChessBoard clone() throws CloneNotSupportedException {
+        ChessBoard cloned = new ChessBoard();
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = this.squares[row][col];
+                if (piece != null) {
+                    cloned.squares[row][col] = new ChessPiece(
+                            piece.getTeamColor(),
+                            piece.getPieceType()
+                    );
+                }
+            }
+        }
+        return cloned;
     }
     @Override
     public boolean equals(Object o) {

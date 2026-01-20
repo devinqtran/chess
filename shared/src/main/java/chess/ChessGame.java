@@ -152,4 +152,19 @@ public class ChessGame {
         }
         board.addPiece(move.getEndPosition(), piece);
     }
+    private ChessBoard copyBoard() {
+        return new ChessBoard(board);
+    }
+    private ChessPosition findKing(TeamColor teamColor) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    return position;
+                }
+            }
+        }
+        return null;
+    }
 }
