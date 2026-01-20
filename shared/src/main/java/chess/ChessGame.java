@@ -38,29 +38,6 @@ public class ChessGame {
         this.currentTurn = team;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ChessGame chessGame = (ChessGame) o;
-        return Objects.equals(board, chessGame.board) && currentTurn == chessGame.currentTurn;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(board, currentTurn);
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("ChessGame{");
-        sb.append("board=").append(board);
-        sb.append(", currentTurn=").append(currentTurn);
-        sb.append('}');
-        return sb.toString();
-    }
-
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
@@ -166,11 +143,9 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        // Must NOT be in check for stalemate
         if (isInCheck(teamColor)) {
             return false;
         }
-        // Check if any valid move exists
         return !anyValidMoves(teamColor);
     }
 
@@ -203,6 +178,11 @@ public class ChessGame {
         }
         board.addPiece(move.getEndPosition(), piece);
     }
+
+    /**
+     * Copy method to use copy constructor from ChessBoard.java
+     * @return
+     */
     private ChessBoard copyBoard() {
         return new ChessBoard(board);
     }
@@ -262,5 +242,29 @@ public class ChessGame {
         // Restore the original board
         this.board = originalBoard;
         return inCheck;
+    }
+    /**
+     * Overrides
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.equals(board, chessGame.board) && currentTurn == chessGame.currentTurn;
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(board, currentTurn);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ChessGame{");
+        sb.append("board=").append(board);
+        sb.append(", currentTurn=").append(currentTurn);
+        sb.append('}');
+        return sb.toString();
     }
 }
