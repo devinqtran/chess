@@ -3,6 +3,8 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -15,11 +17,17 @@ public class ChessGame {
     private ChessBoard board;
     private TeamColor currentTurn;
 
+    // Tracking for en passant and castling
+    private Set<ChessPosition> piecesMoved;
+    private ChessMove previousMove;
+
     public ChessGame() {
         // Creates a new empty board, put pieces into starting positions, set starting turn white
         this.board = new ChessBoard();
         this.board.resetBoard();
         this.currentTurn = TeamColor.WHITE;
+        this.piecesMoved = new HashSet<>();
+        this.previousMove = null;
     }
 
     /**
@@ -60,6 +68,9 @@ public class ChessGame {
         }
         Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new ArrayList<>();
+
+        // Extra credit castling and en passant need to implement moves for king/pawns
+
         for (ChessMove move : possibleMoves) {
             if (!dangerousMove(move, piece.getTeamColor())) {
                 validMoves.add(move);
