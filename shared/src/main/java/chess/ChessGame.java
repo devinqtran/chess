@@ -76,6 +76,7 @@ public class ChessGame {
             possibleMoves.addAll(getEnPassantMoves(startPosition, piece.getTeamColor()));
         }
 
+        // Check for possible moves
         for (ChessMove move : possibleMoves) {
             if (!dangerousMove(move, piece.getTeamColor())) {
                 validMoves.add(move);
@@ -93,12 +94,15 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = board.getPiece(move.getStartPosition());
 
+        // Check for piece at starting position
         if (piece == null) {
             throw new InvalidMoveException("There is no piece at the starting position");
         }
+        // Check whose turn it is
         if (piece.getTeamColor() != currentTurn) {
             throw new InvalidMoveException("Wait for this team's turn");
         }
+        // Check if the move is valid
         Collection<ChessMove> valid = validMoves(move.getStartPosition());
         if (valid == null || !valid.contains(move)) {
             throw new InvalidMoveException("This piece cannot make this move");
@@ -121,10 +125,12 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        // Find the position of the king
         ChessPosition kingPosition = findKing(teamColor);
         if (kingPosition == null) {
             return false;
         }
+        // Set the enemy color for both teams
         TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
@@ -198,7 +204,6 @@ public class ChessGame {
         if (move.getPromotionPiece() != null) {
             piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
         }
-
         // Castling
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             int colDiff = move.getEndPosition().getColumn() - move.getStartPosition().getColumn();
@@ -219,7 +224,6 @@ public class ChessGame {
                 }
             }
         }
-
         // En Passant
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
             int colDiff = Math.abs(move.getEndPosition().getColumn() - move.getStartPosition().getColumn());
@@ -366,9 +370,9 @@ public class ChessGame {
                 }
             }
         }
-
         return castlingMoves;
     }
+
     private Collection<ChessMove> getEnPassantMoves(ChessPosition pawnPos, TeamColor teamColor) {
         Collection<ChessMove> enPassantMoves = new ArrayList<>();
         // Check for previous move
@@ -396,6 +400,7 @@ public class ChessGame {
         enPassantMoves.add(new ChessMove(pawnPos, capturePos, null));
         return enPassantMoves;
     }
+
     private boolean checkSquare(ChessPosition position, TeamColor friendlyColor) {
         TeamColor enemyColor = (friendlyColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         for (int row = 1; row <= 8; row++) {
