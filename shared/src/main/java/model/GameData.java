@@ -11,7 +11,6 @@ import chess.ChessGame;
  * @param gameName The name/title of the game
  * @param game The actual ChessGame object containing the game state
  */
-public record GameData(int gameID, String whiteUsername, String blackUsername,
-                       String gameName, ChessGame game) {
+public record GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
 
 }
