@@ -5,9 +5,7 @@ import dataaccess.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.*;
-import model.*;
-import chess.ChessGame;
-import java.util.*;
+import server.handlers.*;
 
 public class Server {
 
@@ -24,19 +22,28 @@ public class Server {
     private final GameService gameService = new GameService(gameDAO, authDAO);
     private final ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
 
+    // Handlers
+    private final ClearHandler clearHandler = new ClearHandler(clearService);
+    private final RegisterHandler registerHandler = new RegisterHandler(userService);
+    private final LoginHandler loginHandler = new LoginHandler(userService);
+    private final LogoutHandler logoutHandler = new LogoutHandler(userService);
+    private final ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
+    private final CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
+    private final JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
+
     public Server() {
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
         });
 
-        // Register endpoints
-        javalin.delete("/db", this::clearHandler);
-        javalin.post("/user", this::registerHandler);
-        javalin.post("/session", this::loginHandler);
-        javalin.delete("/session", this::logoutHandler);
-        javalin.get("/game", this::listGamesHandler);
-        javalin.post("/game", this::createGameHandler);
-        javalin.put("/game", this::joinGameHandler);
+        // Register endpoints with handler methods
+        javalin.delete("/db", clearHandler::handle);
+        javalin.post("/user", registerHandler::handle);
+        javalin.post("/session", loginHandler::handle);
+        javalin.delete("/session", logoutHandler::handle);
+        javalin.get("/game", listGamesHandler::handle);
+        javalin.post("/game", createGameHandler::handle);
+        javalin.put("/game", joinGameHandler::handle);
 
         // Exception handler
         javalin.exception(DataAccessException.class, this::exceptionHandler);
@@ -49,73 +56,6 @@ public class Server {
 
     public void stop() {
         javalin.stop();
-    }
-
-    // Handler methods
-
-    private void clearHandler(Context ctx) throws DataAccessException {
-        clearService.clear();
-        ctx.status(200);
-        ctx.result(gson.toJson(Collections.emptyMap()));
-    }
-
-    private void registerHandler(Context ctx) throws DataAccessException {
-        var request = gson.fromJson(ctx.body(), RegisterRequest.class);
-        AuthData authData = userService.register(request.username, request.password, request.email);
-        ctx.status(200);
-        ctx.result(gson.toJson(new RegisterResult(authData.username(), authData.authToken())));
-    }
-
-    private void loginHandler(Context ctx) throws DataAccessException {
-        var request = gson.fromJson(ctx.body(), LoginRequest.class);
-        AuthData authData = userService.login(request.username, request.password);
-        ctx.status(200);
-        ctx.result(gson.toJson(new LoginResult(authData.username(), authData.authToken())));
-    }
-
-    private void logoutHandler(Context ctx) throws DataAccessException {
-        String authToken = ctx.header("authorization");
-        userService.logout(authToken);
-        ctx.status(200);
-        ctx.result(gson.toJson(Collections.emptyMap()));
-    }
-
-    private void listGamesHandler(Context ctx) throws DataAccessException {
-        String authToken = ctx.header("authorization");
-        Collection<GameData> games = gameService.listGames(authToken);
-        ctx.status(200);
-        ctx.result(gson.toJson(new ListGamesResult(games)));
-    }
-
-    private void createGameHandler(Context ctx) throws DataAccessException {
-        String authToken = ctx.header("authorization");
-        var request = gson.fromJson(ctx.body(), CreateGameRequest.class);
-        int gameID = gameService.createGame(authToken, request.gameName);
-        ctx.status(200);
-        ctx.result(gson.toJson(new CreateGameResult(gameID)));
-    }
-
-    private void joinGameHandler(Context ctx) throws DataAccessException {
-        String authToken = ctx.header("authorization");
-        var request = gson.fromJson(ctx.body(), JoinGameRequest.class);
-
-        // playerColor is REQUIRED - null, "null", or empty string are all invalid
-        if (request.playerColor == null ||
-                request.playerColor.equals("null") ||
-                request.playerColor.isEmpty()) {
-            throw new DataAccessException("Error: bad request");
-        }
-
-        // Validate it's WHITE or BLACK
-        String colorUpper = request.playerColor.toUpperCase();
-        if (!colorUpper.equals("WHITE") && !colorUpper.equals("BLACK")) {
-            throw new DataAccessException("Error: bad request");
-        }
-
-        ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(colorUpper);
-        gameService.joinGame(authToken, request.gameID, color);
-        ctx.status(200);
-        ctx.result(gson.toJson(Collections.emptyMap()));
     }
 
     private void exceptionHandler(DataAccessException ex, Context ctx) {
@@ -137,14 +77,5 @@ public class Server {
         ctx.result(gson.toJson(new ErrorResult(message)));
     }
 
-    // Request/Result records
-    record RegisterRequest(String username, String password, String email) {}
-    record RegisterResult(String username, String authToken) {}
-    record LoginRequest(String username, String password) {}
-    record LoginResult(String username, String authToken) {}
-    record CreateGameRequest(String gameName) {}
-    record CreateGameResult(Integer gameID) {}
-    record JoinGameRequest(String playerColor, Integer gameID) {}
-    record ListGamesResult(Collection<GameData> games) {}
     record ErrorResult(String message) {}
 }
