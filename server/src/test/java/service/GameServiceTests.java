@@ -38,7 +38,6 @@ public class GameServiceTests {
     }
 
     // List Games Tests
-
     @Test
     @DisplayName("List Games - Positive Test")
     public void listGamesPositive() throws DataAccessException {
@@ -62,7 +61,6 @@ public class GameServiceTests {
     }
 
     // Create Game Tests
-
     @Test
     @DisplayName("Create Game - Positive Test")
     public void createGamePositive() throws DataAccessException {
@@ -97,7 +95,6 @@ public class GameServiceTests {
     }
 
     // Join Game Tests
-
     @Test
     @DisplayName("Join Game - Positive Test")
     public void joinGamePositive() throws DataAccessException {
