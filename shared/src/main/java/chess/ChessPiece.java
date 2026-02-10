@@ -108,6 +108,14 @@ public class ChessPiece {
         return pieceAtPosition == null || pieceAtPosition.getTeamColor() != this.pieceColor;
     }
 
+    // Helper method to add promotion moves
+    private void addPromotionMoves(ChessPosition myPosition, ChessPosition targetPosition, Collection<ChessMove> moves) {
+        moves.add(new ChessMove(myPosition, targetPosition, PieceType.QUEEN));
+        moves.add(new ChessMove(myPosition, targetPosition, PieceType.ROOK));
+        moves.add(new ChessMove(myPosition, targetPosition, PieceType.BISHOP));
+        moves.add(new ChessMove(myPosition, targetPosition, PieceType.KNIGHT));
+    }
+
     private void addSlidingMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int rowDir, int colDir) {
         int currentRow = myPosition.getRow() + rowDir;
         int currentCol = myPosition.getColumn() + colDir;
@@ -200,11 +208,7 @@ public class ChessPiece {
             // Sets possible promotion pieces
             if (board.getPiece(forwardPosition) == null) {
                 if (forwardRow == promotionRow) {
-                    // Add promotion moves
-                    moves.add(new ChessMove(myPosition, forwardPosition, PieceType.QUEEN));
-                    moves.add(new ChessMove(myPosition, forwardPosition, PieceType.ROOK));
-                    moves.add(new ChessMove(myPosition, forwardPosition, PieceType.BISHOP));
-                    moves.add(new ChessMove(myPosition, forwardPosition, PieceType.KNIGHT));
+                    addPromotionMoves(myPosition, forwardPosition, moves);
                 } else {
                     // Regular forward move
                     moves.add(new ChessMove(myPosition, forwardPosition, null));
@@ -233,10 +237,7 @@ public class ChessPiece {
                 if (pieceAtCapture != null && pieceAtCapture.getTeamColor() != this.pieceColor) {
                     // Check to see if promotion is possible
                     if (forwardRow == promotionRow) {
-                        moves.add(new ChessMove(myPosition, capturePosition, PieceType.QUEEN));
-                        moves.add(new ChessMove(myPosition, capturePosition, PieceType.ROOK));
-                        moves.add(new ChessMove(myPosition, capturePosition, PieceType.BISHOP));
-                        moves.add(new ChessMove(myPosition, capturePosition, PieceType.KNIGHT));
+                        addPromotionMoves(myPosition, capturePosition, moves);
                     } else {
                         moves.add(new ChessMove(myPosition, capturePosition, null));
                     }

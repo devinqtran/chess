@@ -125,21 +125,23 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        // Find the position of the king
         ChessPosition kingPosition = findKing(teamColor);
         if (kingPosition == null) {
             return false;
         }
-        // Set the enemy color for both teams
         TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        return isPositionUnderAttack(kingPosition, enemyColor);  // Extracted to helper
+    }
+
+    private boolean isPositionUnderAttack(ChessPosition position, TeamColor enemyColor) {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
-                ChessPosition position = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(position);
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(pos);
                 if (piece != null && piece.getTeamColor() == enemyColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, position);
+                    Collection<ChessMove> moves = piece.pieceMoves(board, pos);
                     for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(kingPosition)) {
+                        if (move.getEndPosition().equals(position)) {
                             return true;
                         }
                     }
