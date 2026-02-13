@@ -4,12 +4,10 @@ package dataaccess;
 import model.GameData;
 import java.util.Collection;
 
-
 /**
  * Data Access Object interface for Game operations
  */
 public interface GameDAO {
-
 
     /**
      * Create a new game in the database
@@ -19,7 +17,6 @@ public interface GameDAO {
      */
     int insertGame(GameData game) throws DataAccessException;
 
-
     /**
      * Retrieve a game by its ID
      * @param gameID The game ID to look up
@@ -28,7 +25,6 @@ public interface GameDAO {
      */
     GameData getGame(int gameID) throws DataAccessException;
 
-
     /**
      * Retrieve all games from the database
      * @return Collection of all GameData objects
@@ -36,14 +32,12 @@ public interface GameDAO {
      */
     Collection<GameData> listGames() throws DataAccessException;
 
-
     /**
      * Update an existing game in the database
      * @param game The updated game data
      * @throws DataAccessException if the game doesn't exist or update fails
      */
     void updateGame(GameData game) throws DataAccessException;
-
 
     /**
      * Clear all games from the database

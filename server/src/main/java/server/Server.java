@@ -8,7 +8,6 @@ import service.*;
 import server.handlers.*;
 
 public class Server {
-
     private final Javalin javalin;
     private final Gson gson = new Gson();
 
