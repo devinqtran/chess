@@ -12,25 +12,49 @@ public class Server {
     private final Gson gson = new Gson();
 
     // DAOs
-    private final UserDAO userDAO = new MemoryUserDAO();
-    private final GameDAO gameDAO = new MemoryGameDAO();
-    private final AuthDAO authDAO = new MemoryAuthDAO();
+    private final UserDAO userDAO;
+    private final GameDAO gameDAO;
+    private final AuthDAO authDAO;
 
     // Services
-    private final UserService userService = new UserService(userDAO, authDAO);
-    private final GameService gameService = new GameService(gameDAO, authDAO);
-    private final ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
+    private final UserService userService;
+    private final GameService gameService;
+    private final ClearService clearService;
 
     // Handlers
-    private final ClearHandler clearHandler = new ClearHandler(clearService);
-    private final RegisterHandler registerHandler = new RegisterHandler(userService);
-    private final LoginHandler loginHandler = new LoginHandler(userService);
-    private final LogoutHandler logoutHandler = new LogoutHandler(userService);
-    private final ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
-    private final CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
-    private final JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
+    private final ClearHandler clearHandler;
+    private final RegisterHandler registerHandler;
+    private final LoginHandler loginHandler;
+    private final LogoutHandler logoutHandler;
+    private final ListGamesHandler listGamesHandler;
+    private final CreateGameHandler createGameHandler;
+    private final JoinGameHandler joinGameHandler;
 
     public Server() {
+        // Initialize the DB tables
+        try {
+            DatabaseInitializer.initialize();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Failed to initialize database", e);
+        }
+
+        // MySQL DAOs
+        userDAO = new MySqlUserDAO();
+        gameDAO = new MySqlGameDAO();
+        authDAO = new MySqlAuthDAO();
+
+        userService = new UserService(userDAO, authDAO);
+        gameService = new GameService(gameDAO, authDAO);
+        clearService = new ClearService(userDAO, gameDAO, authDAO);
+
+        clearHandler = new ClearHandler(clearService);
+        registerHandler = new RegisterHandler(userService);
+        loginHandler = new LoginHandler(userService);
+        logoutHandler = new LogoutHandler(userService);
+        listGamesHandler = new ListGamesHandler(gameService);
+        createGameHandler = new CreateGameHandler(gameService);
+        joinGameHandler = new JoinGameHandler(gameService);
+
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
         });
