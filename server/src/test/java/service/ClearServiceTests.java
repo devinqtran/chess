@@ -25,7 +25,6 @@ public class ClearServiceTests {
         userService = new UserService(userDAO, authDAO);
         gameService = new GameService(gameDAO, authDAO);
         clearService = new ClearService(userDAO, gameDAO, authDAO);
-
         // Clear data before each test
         userDAO.clear();
         gameDAO.clear();
@@ -33,20 +32,17 @@ public class ClearServiceTests {
     }
 
     @Test
-    @DisplayName("Clear - Positive Test")
+    @DisplayName("Clear service positive test")
     public void clearPositive() throws DataAccessException {
         // Add some data
         var auth = userService.register("user1", "pass1", "email1@test.com");
         gameService.createGame(auth.authToken(), "Game1");
-
         // Verify data exists
         assertNotNull(userDAO.getUser("user1"));
         assertFalse(gameDAO.listGames().isEmpty());
         assertNotNull(authDAO.getAuth(auth.authToken()));
-
         // Clear all data
         clearService.clear();
-
         // Verify all data is gone
         assertNull(userDAO.getUser("user1"));
         assertTrue(gameDAO.listGames().isEmpty());

@@ -130,7 +130,7 @@ public class ChessGame {
             return false;
         }
         TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-        return isPositionUnderAttack(kingPosition, enemyColor);  // Extracted to helper
+        return isPositionUnderAttack(kingPosition, enemyColor);
     }
 
     private boolean isPositionUnderAttack(ChessPosition position, TeamColor enemyColor) {
