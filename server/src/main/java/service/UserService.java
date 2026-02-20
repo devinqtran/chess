@@ -38,8 +38,9 @@ public class UserService {
             throw new DataAccessException("Error: already taken");
         }
 
-        // Create new user
-        UserData newUser = new UserData(username, password, email);
+        // Create new user with hashing
+        String hashedPassword = org.mindrot.jbcrypt.BCrypt.hashpw(password, org.mindrot.jbcrypt.BCrypt.gensalt());
+        UserData newUser = new UserData(username, hashedPassword, email);
         userDAO.insertUser(newUser);
 
         // Create auth token
@@ -63,9 +64,9 @@ public class UserService {
             throw new DataAccessException("Error: bad request");
         }
 
-        // Get user
+        // Get user with hash passwords
         UserData user = userDAO.getUser(username);
-        if (user == null || !user.password().equals(password)) {
+        if (user == null || !org.mindrot.jbcrypt.BCrypt.checkpw(password, user.password())) {
             throw new DataAccessException("Error: unauthorized");
         }
 
