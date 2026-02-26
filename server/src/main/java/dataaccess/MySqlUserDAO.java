@@ -49,7 +49,7 @@ public class MySqlUserDAO implements UserDAO {
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement("TRUNCATE TABLE users")) {
             ps.executeUpdate();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new DataAccessException("Error: " + e.getMessage());
         }
     }

@@ -91,7 +91,7 @@ public class MySqlGameDAO implements GameDAO {
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement("TRUNCATE TABLE games")) {
             ps.executeUpdate();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new DataAccessException("Error: " + e.getMessage());
         }
     }

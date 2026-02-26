@@ -60,7 +60,7 @@ public class MySqlAuthDAO implements AuthDAO {
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement("TRUNCATE TABLE authTokens")) {
             ps.executeUpdate();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new DataAccessException("Error: " + e.getMessage());
         }
     }

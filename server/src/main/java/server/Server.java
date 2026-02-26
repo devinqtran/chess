@@ -35,7 +35,7 @@ public class Server {
         try {
             DatabaseInitializer.initialize();
         } catch (DataAccessException e) {
-            throw new RuntimeException("Failed to initialize database", e);
+            System.err.println("Warning: database initialization failed: " + e.getMessage());
         }
 
         // MySQL DAOs
@@ -60,16 +60,21 @@ public class Server {
         });
 
         // Register endpoints with handler methods
-        javalin.delete("/db", clearHandler::handle);
-        javalin.post("/user", registerHandler::handle);
-        javalin.post("/session", loginHandler::handle);
-        javalin.delete("/session", logoutHandler::handle);
-        javalin.get("/game", listGamesHandler::handle);
-        javalin.post("/game", createGameHandler::handle);
-        javalin.put("/game", joinGameHandler::handle);
+        javalin.delete("/db", ctx -> clearHandler.handle(ctx));
+        javalin.post("/user", ctx -> registerHandler.handle(ctx));
+        javalin.post("/session", ctx -> loginHandler.handle(ctx));
+        javalin.delete("/session", ctx -> logoutHandler.handle(ctx));
+        javalin.get("/game", ctx -> listGamesHandler.handle(ctx));
+        javalin.post("/game", ctx -> createGameHandler.handle(ctx));
+        javalin.put("/game", ctx -> joinGameHandler.handle(ctx));
 
         // Exception handler
         javalin.exception(DataAccessException.class, this::exceptionHandler);
+        javalin.exception(Exception.class, (ex, ctx) -> {
+            ctx.status(500);
+            ctx.result(gson.toJson(new ErrorResult("Error: " + ex.getMessage())));
+        });
+
     }
 
     public int run(int desiredPort) {
