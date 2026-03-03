@@ -3,10 +3,6 @@ package dataaccess;
 import model.UserData;
 import java.sql.SQLException;
 
-/**
- * MySQL version of UserDAO interface
- * Each method opens connection, prepares SQL statement, fills values, executes, then reads results/errors
- */
 public class MySqlUserDAO implements UserDAO {
 
     @Override
@@ -19,7 +15,6 @@ public class MySqlUserDAO implements UserDAO {
             ps.setString(3, user.email());
             ps.executeUpdate();
         } catch (SQLException e) {
-            // Error code for duplicate primary key (existing user)
             if (e.getErrorCode() == 1062) {
                 throw new DataAccessException("Error: already taken");
             }
