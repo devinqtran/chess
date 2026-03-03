@@ -28,7 +28,7 @@ public class UserDAOTests {
     }
 
     @Test
-    public void insertUserNegative_duplicate() throws DataAccessException {
+    public void insertUserNegativeDuplicate() throws DataAccessException {
         userDAO.insertUser(new UserData("alice", "hashedpw", "alice@test.com"));
         assertThrows(DataAccessException.class, () ->
                 userDAO.insertUser(new UserData("alice", "other", "other@test.com"))
@@ -44,7 +44,7 @@ public class UserDAOTests {
     }
 
     @Test
-    public void getUserNegative_notFound() throws DataAccessException {
+    public void getUserNegativeNotFound() throws DataAccessException {
         UserData result = userDAO.getUser("nonexistent");
         assertNull(result);
     }

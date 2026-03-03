@@ -29,7 +29,7 @@ public class GameDAOTests {
     }
 
     @Test
-    public void insertGameNegative_nullName() {
+    public void insertGameNegativeNullName() {
         assertThrows(DataAccessException.class, () ->
                 gameDAO.insertGame(new GameData(0, null, null, null, new ChessGame()))
         );
@@ -44,7 +44,7 @@ public class GameDAOTests {
     }
 
     @Test
-    public void getGameNegative_notFound() throws DataAccessException {
+    public void getGameNegativeNotFound() throws DataAccessException {
         GameData result = gameDAO.getGame(999999);
         assertNull(result);
     }
@@ -58,7 +58,7 @@ public class GameDAOTests {
     }
 
     @Test
-    public void listGamesNegative_empty() throws DataAccessException {
+    public void listGamesNegativeEmpty() throws DataAccessException {
         var games = gameDAO.listGames();
         assertNotNull(games);
         assertTrue(games.isEmpty());
@@ -74,7 +74,7 @@ public class GameDAOTests {
     }
 
     @Test
-    public void updateGameNegative_notFound() {
+    public void updateGameNegativeNotFound() {
         assertThrows(DataAccessException.class, () ->
                 gameDAO.updateGame(new GameData(999999, "user", null, "Ghost", new ChessGame()))
         );

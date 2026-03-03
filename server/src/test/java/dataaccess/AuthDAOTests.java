@@ -28,7 +28,7 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void insertAuthNegative_duplicate() throws DataAccessException {
+    public void insertAuthNegativeDuplicate() throws DataAccessException {
         authDAO.insertAuth(new AuthData("token-abc", "alice"));
         assertThrows(DataAccessException.class, () ->
                 authDAO.insertAuth(new AuthData("token-abc", "bob"))
@@ -44,7 +44,7 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void getAuthNegative_notFound() throws DataAccessException {
+    public void getAuthNegativeNotFound() throws DataAccessException {
         AuthData result = authDAO.getAuth("bogus-token");
         assertNull(result);
     }
@@ -57,7 +57,7 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void deleteAuthNegative_notFound() {
+    public void deleteAuthNegativeNotFound() {
         assertThrows(DataAccessException.class, () ->
                 authDAO.deleteAuth("nonexistent-token")
         );
