@@ -47,7 +47,18 @@ public class ServerFacade {
     }
 
     public void logout(String authToken) throws Exception {
-        throw new Exception("Not yet implemented");
+        // Open connection
+        URI uri = new URI(serverUrl + "/session");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("DELETE");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Authorization", authToken);
+
+        http.connect();
+
+        if (http.getResponseCode() / 100 != 2) {
+            throw new Exception("Logout failed: " + http.getResponseCode());
+        }
     }
 
     //

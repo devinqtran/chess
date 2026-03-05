@@ -46,10 +46,25 @@ public class ServerFacadeTests {
 
     @Test
     void registerNegative() throws Exception {
-        // Registering the same username twice should throw
+        // Registering the same username twice throws
         facade.register("alice", "password", "alice@email.com");
         assertThrows(Exception.class, () ->
                 facade.register("alice", "password", "alice@email.com")
+        );
+    }
+
+    @Test
+    void logoutPositive() throws Exception {
+        // Register and then logout successfully
+        AuthData auth = facade.register("alice", "password", "alice@email.com");
+        assertDoesNotThrow(() -> facade.logout(auth.authToken()));
+    }
+
+    @Test
+    void logoutNegative() throws Exception {
+        // Logging out with a bad token throws exception
+        assertThrows(Exception.class, () ->
+                facade.logout("invalidTokenThatDoesNotExist")
         );
     }
 

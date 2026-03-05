@@ -13,6 +13,8 @@ public class LogoutHandler {
 
     public void handle(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
+        // Debug
+        System.out.println("Token received by server: " + authToken);
         userService.logout(authToken);
         ctx.status(200);
         ctx.result("{}");
