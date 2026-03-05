@@ -68,4 +68,23 @@ public class ServerFacadeTests {
         );
     }
 
+    @Test
+    void loginPositive() throws Exception {
+        // Register first then login
+        facade.register("alice", "password", "alice@email.com");
+        AuthData auth = facade.login("alice", "password");
+        assertNotNull(auth);
+        assertNotNull(auth.authToken());
+        assertTrue(auth.authToken().length() > 10);
+        assertEquals("alice", auth.username());
+    }
+
+    @Test
+    void loginNegative() throws Exception {
+        // Login with a fake username
+        assertThrows(Exception.class, () ->
+                facade.login("nonexistentUser", "password")
+        );
+    }
+
 }
