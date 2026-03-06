@@ -39,7 +39,7 @@ public class ServerFacade {
             throw new Exception("Register failed: " + http.getResponseCode());
         }
 
-        // Read and return the response
+        // Read and return response
         try (InputStream is = http.getInputStream();
              InputStreamReader reader = new InputStreamReader(is)) {
             return gson.fromJson(reader, AuthData.class);
@@ -83,11 +83,40 @@ public class ServerFacade {
             throw new Exception("Login failed: " + http.getResponseCode());
         }
 
-        // Read and return the response
+        // Read and return response
         try (InputStream is = http.getInputStream();
              InputStreamReader reader = new InputStreamReader(is)) {
             return gson.fromJson(reader, AuthData.class);
         }
+    }
+
+    // List games method
+    public GameData[] listGames(String authToken) throws Exception {
+        // Open the connection
+        URI uri = new URI(serverUrl + "/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("GET");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Authorization", authToken);
+
+        http.connect();
+
+        // Check for errors
+        if (http.getResponseCode() / 100 != 2) {
+            throw new Exception("List games failed: " + http.getResponseCode());
+        }
+
+        // Read and return response
+        try (InputStream is = http.getInputStream();
+             InputStreamReader reader = new InputStreamReader(is)) {
+            record GamesResponse(GameData[] games) {}
+            return gson.fromJson(reader, GamesResponse.class).games();
+        }
+    }
+
+    // Create game method
+    public int createGame(String authToken, String gameName) throws Exception {
+        throw new Exception("Not yet implemented!");
     }
 
     // Clear method

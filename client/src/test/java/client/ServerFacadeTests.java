@@ -1,6 +1,7 @@
 package client;
 
 import model.AuthData;
+import model.GameData;
 import org.junit.jupiter.api.*;
 import server.Server;
 
@@ -84,6 +85,25 @@ public class ServerFacadeTests {
         // Login with a fake username
         assertThrows(Exception.class, () ->
                 facade.login("nonexistentUser", "password")
+        );
+    }
+
+    @Test
+    void listGamesPositive() throws Exception {
+        // Register, create games then list them
+        AuthData auth = facade.register("alice", "password", "alice@email.com");
+        facade.createGame(auth.authToken(), "Game 1");
+        facade.createGame(auth.authToken(), "Game 2");
+        GameData[] games = facade.listGames(auth.authToken());
+        assertNotNull(games);
+        assertEquals(2, games.length);
+    }
+
+    @Test
+    void listGamesNegative() throws Exception {
+        // Listing games with an invalid auth token should throw
+        assertThrows(Exception.class, () ->
+                facade.listGames("invalidTokenThatDoesNotExist")
         );
     }
 
