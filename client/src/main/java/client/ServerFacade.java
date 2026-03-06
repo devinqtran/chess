@@ -116,6 +116,38 @@ public class ServerFacade {
 
     // Create game method
     public int createGame(String authToken, String gameName) throws Exception {
+        // Open the connection
+        URI uri = new URI(serverUrl + "/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("POST");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Authorization", authToken);
+        http.setDoOutput(true);
+
+        // Write the request body
+        var body = new HashMap<String, String>();
+        body.put("gameName", gameName);
+        try (OutputStream os = http.getOutputStream();
+             OutputStreamWriter writer = new OutputStreamWriter(os)) {
+            gson.toJson(body, writer);
+        }
+
+        http.connect();
+
+        // Check for errors
+        if (http.getResponseCode() / 100 != 2) {
+            throw new Exception("Create game failed: " + http.getResponseCode());
+        }
+
+        // Read and return the new game ID
+        try (InputStream is = http.getInputStream();
+             InputStreamReader reader = new InputStreamReader(is)) {
+            record CreateGameResponse(int gameID) {}
+            return gson.fromJson(reader, CreateGameResponse.class).gameID();
+        }
+    }
+
+    public void joinGame(String authToken, int gameID, String playerColor) throws Exception {
         throw new Exception("Not yet implemented!");
     }
 

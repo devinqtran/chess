@@ -90,7 +90,7 @@ public class ServerFacadeTests {
 
     @Test
     void listGamesPositive() throws Exception {
-        // Register, create games then list them
+        // Register create games and list them
         AuthData auth = facade.register("alice", "password", "alice@email.com");
         facade.createGame(auth.authToken(), "Game 1");
         facade.createGame(auth.authToken(), "Game 2");
@@ -101,10 +101,28 @@ public class ServerFacadeTests {
 
     @Test
     void listGamesNegative() throws Exception {
-        // Listing games with an invalid auth token should throw
+        // Listing games with an invalid auth token throws
         assertThrows(Exception.class, () ->
                 facade.listGames("invalidTokenThatDoesNotExist")
         );
     }
+
+    @Test
+    void createGamePositive() throws Exception {
+        // Register and create a game verify valid game ID
+        AuthData auth = facade.register("alice", "password", "alice@email.com");
+        int gameID = facade.createGame(auth.authToken(), "Test Game");
+        assertTrue(gameID > 0);
+    }
+
+    @Test
+    void createGameNegative() throws Exception {
+        // Create game with an invalid auth token throws
+        assertThrows(Exception.class, () ->
+                facade.createGame("invalidTokenThatDoesNotExist", "Test Game")
+        );
+    }
+
+
 
 }
