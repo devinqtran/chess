@@ -148,7 +148,30 @@ public class ServerFacade {
     }
 
     public void joinGame(String authToken, int gameID, String playerColor) throws Exception {
-        throw new Exception("Not yet implemented!");
+        // Open the connection
+        URI uri = new URI(serverUrl + "/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("PUT");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Authorization", authToken);
+        http.setDoOutput(true);
+
+        // Write the request body
+        var body = new HashMap<String, Object>();
+        body.put("gameID", gameID);
+        if (playerColor != null) {
+            body.put("playerColor", playerColor);
+        }
+        try (OutputStream os = http.getOutputStream();
+             OutputStreamWriter writer = new OutputStreamWriter(os)) {
+            gson.toJson(body, writer);
+        }
+
+        http.connect();
+
+        if (http.getResponseCode() / 100 != 2) {
+            throw new Exception("Join game failed: " + http.getResponseCode());
+        }
     }
 
     // Clear method

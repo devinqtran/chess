@@ -123,6 +123,21 @@ public class ServerFacadeTests {
         );
     }
 
+    @Test
+    void joinGamePositive() throws Exception {
+        // Register, create a game, and join as white
+        AuthData auth = facade.register("alice", "password", "alice@email.com");
+        int gameID = facade.createGame(auth.authToken(), "Test Game");
+        assertDoesNotThrow(() -> facade.joinGame(auth.authToken(), gameID, "WHITE"));
+    }
 
+    @Test
+    void joinGameNegative() throws Exception {
+        // Joining a nonexistent game throws exception
+        AuthData auth = facade.register("alice", "password", "alice@email.com");
+        assertThrows(Exception.class, () ->
+                facade.joinGame(auth.authToken(), 99999, "WHITE")
+        );
+    }
 
 }
