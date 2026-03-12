@@ -2,6 +2,7 @@ package client;
 
 import java.util.Scanner;
 
+// Read the input command and handle it (help, quit, login, register)
 public class PreloginClient {
     private final ServerFacade facade;
     private final Scanner scanner;
@@ -15,8 +16,13 @@ public class PreloginClient {
     // Temporary stub
     public State run() {
         System.out.print("\n[LOGGED OUT] >>> ");
-        scanner.nextLine();
-        return State.QUIT;
+        String line = scanner.nextLine().trim();
+        String[] tokens = line.split("\\s+");
+        String command = tokens[0].toLowerCase();
+
+        // Print command
+        System.out.println("You typed: " + command);
+        return State.PRELOGIN;
     }
 
     public String getAuthToken() { return authToken; }
