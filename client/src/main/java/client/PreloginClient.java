@@ -65,9 +65,21 @@ public class PreloginClient {
         }
     }
 
+    // Login command method
     private State handleLogin(String[] tokens) {
-        System.out.println("Login coming soon!");
-        return State.PRELOGIN;
+        if (tokens.length != 3) {
+            System.out.println("Usage: login <username> <password>");
+            return State.PRELOGIN;
+        }
+        try {
+            AuthData auth = facade.login(tokens[1], tokens[2]);
+            authToken = auth.authToken();
+            System.out.println("Logged in as " + auth.username());
+            return State.POSTLOGIN;
+        } catch (Exception e) {
+            System.out.println("Login failed: " + e.getMessage());
+            return State.PRELOGIN;
+        }
     }
 
     public String getAuthToken() { return authToken; }
