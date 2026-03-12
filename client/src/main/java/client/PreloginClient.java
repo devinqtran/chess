@@ -1,5 +1,7 @@
 package client;
 
+import model.AuthData;
+
 import java.util.Scanner;
 
 // Read the input command and handle it (help, quit, login, register)
@@ -13,15 +15,58 @@ public class PreloginClient {
         this.scanner = scanner;
     }
 
-    // Temporary stub
+    // Method to detect commands with switch for each command type
     public State run() {
         System.out.print("\n[LOGGED OUT] >>> ");
         String line = scanner.nextLine().trim();
         String[] tokens = line.split("\\s+");
         String command = tokens[0].toLowerCase();
 
-        // Print command
-        System.out.println("You typed: " + command);
+        return switch (command) {
+            case "help" -> {
+                printHelp();
+                yield State.PRELOGIN;
+            }
+            case "quit" -> State.QUIT;
+            case "register" -> handleRegister(tokens);
+            case "login" -> handleLogin(tokens);
+            default -> {
+                System.out.println("Unknown command. Type 'help' for options.");
+                yield State.PRELOGIN;
+            }
+        };
+    }
+
+    // Helper method to define commands
+    private void printHelp() {
+        System.out.println("""
+            Available commands:
+              register <username> <password> <email>  - Create a new account
+              login <username> <password>             - Login to your account
+              quit                                    - Exit the program
+              help                                    - Show this help text
+            """);
+    }
+
+    // Register command method
+    private State handleRegister(String[] tokens) {
+        if (tokens.length != 4) {
+            System.out.println("Usage: register <username> <password> <email>");
+            return State.PRELOGIN;
+        }
+        try {
+            AuthData auth = facade.register(tokens[1], tokens[2], tokens[3]);
+            authToken = auth.authToken();
+            System.out.println("Registered and logged in as " + auth.username());
+            return State.POSTLOGIN;
+        } catch (Exception e) {
+            System.out.println("Registration failed: " + e.getMessage());
+            return State.PRELOGIN;
+        }
+    }
+
+    private State handleLogin(String[] tokens) {
+        System.out.println("Login coming soon!");
         return State.PRELOGIN;
     }
 
