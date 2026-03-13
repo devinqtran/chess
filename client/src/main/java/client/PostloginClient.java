@@ -40,12 +40,26 @@ public class PostloginClient {
     }
 
     private void printHelp() {
-        System.out.println("Help not yet implemented!");
+        System.out.println("""
+            Available commands:
+              list                             - List all available games
+              create <name>                    - Create a new game
+              play <game number> <WHITE|BLACK> - Join a game as a player
+              observe <game number>            - Observe a game
+              logout                           - Logout of your account
+              help                             - Show this help text
+            """);
     }
 
     private State handleLogout() {
-        System.out.println("Logout not yet implemented!");
-        return State.POSTLOGIN;
+        try {
+            facade.logout(authToken);
+            System.out.println("Logged out successfully.");
+            return State.PRELOGIN;
+        } catch (Exception e) {
+            System.out.println("Logout failed: " + e.getMessage());
+            return State.POSTLOGIN;
+        }
     }
 
     private State handleCreate(String[] tokens) {
