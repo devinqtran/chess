@@ -39,6 +39,7 @@ public class PostloginClient {
         };
     }
 
+    // Help command method
     private void printHelp() {
         System.out.println("""
             Available commands:
@@ -51,6 +52,7 @@ public class PostloginClient {
             """);
     }
 
+    // Logout command method
     private State handleLogout() {
         try {
             facade.logout(authToken);
@@ -62,23 +64,53 @@ public class PostloginClient {
         }
     }
 
+    // Create command method
     private State handleCreate(String[] tokens) {
-        System.out.println("Create not yet implemented!");
+        if (tokens.length < 2) {
+            System.out.println("Usage: create <game name>");
+            return State.POSTLOGIN;
+        }
+        String gameName = String.join(" ", java.util.Arrays.copyOfRange(tokens, 1, tokens.length));
+        try {
+            facade.createGame(authToken, gameName);
+            System.out.println("Game '" + gameName + "' created successfully.");
+        } catch (Exception e) {
+            System.out.println("Create game failed: " + e.getMessage());
+        }
         return State.POSTLOGIN;
     }
 
+    // List command method
     private State handleList() {
-        System.out.println("List not yet implemented!");
+        try {
+            cachedGames = facade.listGames(authToken);
+            if (cachedGames.length == 0) {
+                System.out.println("No games available.");
+            } else {
+                System.out.println("Available games:");
+                for (int i = 0; i < cachedGames.length; i++) {
+                    GameData game = cachedGames[i];
+                    String white = game.whiteUsername() != null ? game.whiteUsername() : "open";
+                    String black = game.blackUsername() != null ? game.blackUsername() : "open";
+                    System.out.printf("  %d. %s  [white: %s | black: %s]%n",
+                            i + 1, game.gameName(), white, black);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("List games failed: " + e.getMessage());
+        }
         return State.POSTLOGIN;
     }
 
+    // Play command method
     private State handlePlay(String[] tokens) {
-        System.out.println("Play not yet implemented!");
+        System.out.println("Play coming soon!");
         return State.POSTLOGIN;
     }
 
+    // Observe command method
     private State handleObserve(String[] tokens) {
-        System.out.println("Observe not yet implemented!");
+        System.out.println("Observe coming soon!");
         return State.POSTLOGIN;
     }
 }

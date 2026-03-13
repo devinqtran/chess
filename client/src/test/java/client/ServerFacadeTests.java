@@ -38,26 +38,26 @@ public class ServerFacadeTests {
 
     @Test
     void registerPositive() throws Exception {
-        AuthData auth = facade.register("alice", "password", "alice@email.com");
+        AuthData auth = facade.register("testuser", "password", "testuser@email.com");
         assertNotNull(auth);
         assertNotNull(auth.authToken());
         assertTrue(auth.authToken().length() > 10);
-        assertEquals("alice", auth.username());
+        assertEquals("testuser", auth.username());
     }
 
     @Test
     void registerNegative() throws Exception {
         // Registering the same username twice throws
-        facade.register("alice", "password", "alice@email.com");
+        facade.register("testuser", "password", "testuser@email.com");
         assertThrows(Exception.class, () ->
-                facade.register("alice", "password", "alice@email.com")
+                facade.register("testuser", "password", "testuser@email.com")
         );
     }
 
     @Test
     void logoutPositive() throws Exception {
         // Register and then logout successfully
-        AuthData auth = facade.register("alice", "password", "alice@email.com");
+        AuthData auth = facade.register("testuser", "password", "testuser@email.com");
         assertDoesNotThrow(() -> facade.logout(auth.authToken()));
     }
 
@@ -72,12 +72,12 @@ public class ServerFacadeTests {
     @Test
     void loginPositive() throws Exception {
         // Register first then login
-        facade.register("alice", "password", "alice@email.com");
-        AuthData auth = facade.login("alice", "password");
+        facade.register("testuser", "password", "testuser@email.com");
+        AuthData auth = facade.login("testuser", "password");
         assertNotNull(auth);
         assertNotNull(auth.authToken());
         assertTrue(auth.authToken().length() > 10);
-        assertEquals("alice", auth.username());
+        assertEquals("testuser", auth.username());
     }
 
     @Test
@@ -91,7 +91,7 @@ public class ServerFacadeTests {
     @Test
     void listGamesPositive() throws Exception {
         // Register create games and list them
-        AuthData auth = facade.register("alice", "password", "alice@email.com");
+        AuthData auth = facade.register("testuser", "password", "testuser@email.com");
         facade.createGame(auth.authToken(), "Game 1");
         facade.createGame(auth.authToken(), "Game 2");
         GameData[] games = facade.listGames(auth.authToken());
@@ -110,7 +110,7 @@ public class ServerFacadeTests {
     @Test
     void createGamePositive() throws Exception {
         // Register and create a game verify valid game ID
-        AuthData auth = facade.register("alice", "password", "alice@email.com");
+        AuthData auth = facade.register("testuser", "password", "testuser@email.com");
         int gameID = facade.createGame(auth.authToken(), "Test Game");
         assertTrue(gameID > 0);
     }
@@ -126,7 +126,7 @@ public class ServerFacadeTests {
     @Test
     void joinGamePositive() throws Exception {
         // Register, create a game, and join as white
-        AuthData auth = facade.register("alice", "password", "alice@email.com");
+        AuthData auth = facade.register("testuser", "password", "testuser@email.com");
         int gameID = facade.createGame(auth.authToken(), "Test Game");
         assertDoesNotThrow(() -> facade.joinGame(auth.authToken(), gameID, "WHITE"));
     }
@@ -134,7 +134,7 @@ public class ServerFacadeTests {
     @Test
     void joinGameNegative() throws Exception {
         // Joining a nonexistent game throws exception
-        AuthData auth = facade.register("alice", "password", "alice@email.com");
+        AuthData auth = facade.register("testuser", "password", "testuser@email.com");
         assertThrows(Exception.class, () ->
                 facade.joinGame(auth.authToken(), 99999, "WHITE")
         );
