@@ -104,13 +104,64 @@ public class PostloginClient {
 
     // Play command method
     private State handlePlay(String[] tokens) {
-        System.out.println("Play coming soon!");
+        if (tokens.length != 3) {
+            System.out.println("Usage: play <game number> <WHITE|BLACK>");
+            return State.POSTLOGIN;
+        }
+        try {
+            int gameNumber = Integer.parseInt(tokens[1]);
+            String color = tokens[2].toUpperCase();
+
+            if (!color.equals("WHITE") && !color.equals("BLACK")) {
+                System.out.println("Color must be WHITE or BLACK.");
+                return State.POSTLOGIN;
+            }
+            if (cachedGames.length == 0) {
+                System.out.println("Please run 'list' first to see available games.");
+                return State.POSTLOGIN;
+            }
+            if (gameNumber < 1 || gameNumber > cachedGames.length) {
+                System.out.println("Invalid game number. Please run 'list' to see available games.");
+                return State.POSTLOGIN;
+            }
+
+            int gameID = cachedGames[gameNumber - 1].gameID();
+            facade.joinGame(authToken, gameID, color);
+            System.out.println("Joined game as " + color);
+            BoardRenderer.render(color.equals("WHITE"));
+
+        } catch (NumberFormatException e) {
+            System.out.println("Game number must be a number.");
+        } catch (Exception e) {
+            System.out.println("Join game failed: " + e.getMessage());
+        }
         return State.POSTLOGIN;
     }
 
     // Observe command method
     private State handleObserve(String[] tokens) {
-        System.out.println("Observe coming soon!");
+        if (tokens.length != 2) {
+            System.out.println("Usage: observe <game number>");
+            return State.POSTLOGIN;
+        }
+        try {
+            int gameNumber = Integer.parseInt(tokens[1]);
+
+            if (cachedGames.length == 0) {
+                System.out.println("Please run 'list' first to see available games.");
+                return State.POSTLOGIN;
+            }
+            if (gameNumber < 1 || gameNumber > cachedGames.length) {
+                System.out.println("Invalid game number. Please run 'list' to see available games.");
+                return State.POSTLOGIN;
+            }
+
+            System.out.println("Observing game " + gameNumber);
+            BoardRenderer.render(true); // observers always see white perspective
+
+        } catch (NumberFormatException e) {
+            System.out.println("Game number must be a number.");
+        }
         return State.POSTLOGIN;
     }
 }
