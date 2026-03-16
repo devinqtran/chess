@@ -58,8 +58,7 @@ public class BoardRenderer {
                 EscapeSequences.SET_TEXT_COLOR_WHITE + "   ");
         for (int col = 0; col < 8; col++) {
             int chessColumn = whitePerspective ? (col + 1) : (8 - col);
-            System.out.print(" " + COLUMN_LABELS[chessColumn - 1] + "\u2003");
-        }
+            System.out.print(" " + COLUMN_LABELS[chessColumn - 1] + " ");        }
         System.out.print("   " +
                 EscapeSequences.RESET_BG_COLOR +
                 EscapeSequences.RESET_TEXT_BOLD_FAINT +
@@ -70,16 +69,20 @@ public class BoardRenderer {
     // Method for retrieving each piece
     private static String getPieceDisplay(ChessPiece piece) {
         if (piece == null) {
-            return EscapeSequences.EMPTY; // " \u2003 "
+            return "   ";
         }
         boolean isWhite = piece.getTeamColor() == ChessGame.TeamColor.WHITE;
-        return switch (piece.getPieceType()) {
-            case KING   -> isWhite ? EscapeSequences.WHITE_KING   : EscapeSequences.BLACK_KING;
-            case QUEEN  -> isWhite ? EscapeSequences.WHITE_QUEEN  : EscapeSequences.BLACK_QUEEN;
-            case ROOK   -> isWhite ? EscapeSequences.WHITE_ROOK   : EscapeSequences.BLACK_ROOK;
-            case BISHOP -> isWhite ? EscapeSequences.WHITE_BISHOP : EscapeSequences.BLACK_BISHOP;
-            case KNIGHT -> isWhite ? EscapeSequences.WHITE_KNIGHT : EscapeSequences.BLACK_KNIGHT;
-            case PAWN   -> isWhite ? EscapeSequences.WHITE_PAWN   : EscapeSequences.BLACK_PAWN;
+        String color = isWhite
+                ? EscapeSequences.SET_TEXT_COLOR_WHITE
+                : EscapeSequences.SET_TEXT_COLOR_BLACK;
+        String letter = switch (piece.getPieceType()) {
+            case KING   -> "K";
+            case QUEEN  -> "Q";
+            case ROOK   -> "R";
+            case BISHOP -> "B";
+            case KNIGHT -> "N";
+            case PAWN   -> "P";
         };
+        return color + " " + letter + " " + EscapeSequences.RESET_TEXT_COLOR;
     }
 }
