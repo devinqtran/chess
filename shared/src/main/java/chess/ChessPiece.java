@@ -143,41 +143,31 @@ public class ChessPiece {
             currentCol += colDir;
         }
     }
-    private void addKingMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
-        // Define all 8 possible squares
-        int [][] kingOffsets = {
-                {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}
-        };
-        for (int[] offset : kingOffsets) {
+    // Helper method to fix duplicated code blocks
+    private void addMovesFromOffsets(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int[][] offsets) {
+        for (int[] offset : offsets) {
             int newRow = myPosition.getRow() + offset[0];
             int newColumn = myPosition.getColumn() + offset[1];
-            // Check to see if each position is valid, adds move if valid
+
             if (isValidPosition(newRow, newColumn)) {
                 ChessPosition newPosition = new ChessPosition(newRow, newColumn);
-                // Check if position is occupied
                 if (canMoveto(board, newPosition)) {
                     moves.add(new ChessMove(myPosition, newPosition, null));
                 }
             }
         }
     }
+    private void addKingMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
+        int[][] kingOffsets = {
+                {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}
+        };
+        addMovesFromOffsets(board, myPosition, moves, kingOffsets);
+    }
     private void addKnightMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
-        // Define knight offsets
-        int [][] knightOffsets = {
+        int[][] knightOffsets = {
                 {2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}
         };
-        for (int[] offset : knightOffsets) {
-            int newRow = myPosition.getRow() + offset[0];
-            int newColumn = myPosition.getColumn() + offset[1];
-            // Check to see if each position is valid, adds move if valid
-            if (isValidPosition(newRow, newColumn)) {
-                ChessPosition newPosition = new ChessPosition(newRow, newColumn);
-                // Check if position is occupied
-                if (canMoveto(board, newPosition)) {
-                    moves.add(new ChessMove(myPosition, newPosition, null));
-                }
-            }
-        }
+        addMovesFromOffsets(board, myPosition, moves, knightOffsets);
     }
     private void addBishopMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
         addSlidingMoves(board, myPosition, moves, 1, 1);

@@ -136,15 +136,21 @@ public class ChessGame {
     private boolean isPositionUnderAttack(ChessPosition position, TeamColor enemyColor) {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
-                ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(pos);
-                if (piece != null && piece.getTeamColor() == enemyColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, pos);
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(position)) {
-                            return true;
-                        }
-                    }
+                if (checkIfPieceAttacks(new ChessPosition(row, col), position, enemyColor)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Helper method to fix nesting depth
+    private boolean checkIfPieceAttacks(ChessPosition attackerPos, ChessPosition targetPos, TeamColor enemyColor) {
+        ChessPiece piece = board.getPiece(attackerPos);
+        if (piece != null && piece.getTeamColor() == enemyColor) {
+            for (ChessMove move : piece.pieceMoves(board, attackerPos)) {
+                if (move.getEndPosition().equals(targetPos)) {
+                    return true;
                 }
             }
         }
@@ -238,6 +244,30 @@ public class ChessGame {
         board.addPiece(move.getEndPosition(), piece);
     }
 
+    // Helper methods for castling
+    private boolean isPathClear(int row, int startCol, int endCol) {
+        int min = Math.min(startCol, endCol);
+        int max = Math.max(startCol, endCol);
+        for (int col = min; col <= max; col++) {
+            if (board.getPiece(new ChessPosition(row, col)) != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isPathSafe(int row, int startCol, int endCol, TeamColor enemyColor) {
+        int min = Math.min(startCol, endCol);
+        int max = Math.max(startCol, endCol);
+        for (int col = min; col <= max; col++) {
+            if (isPositionUnderAttack(new ChessPosition(row, col), enemyColor)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     /**
      * Copy method to use copy constructor from ChessBoard.java
      * @return
@@ -309,66 +339,33 @@ public class ChessGame {
      */
     private Collection<ChessMove> getCastlingMoves(ChessPosition kingPos, TeamColor teamColor) {
         Collection<ChessMove> castlingMoves = new ArrayList<>();
-        // Check to see if the king piece has been moved or for check
-        if (piecesMoved.contains(kingPos)) {
+
+        if (piecesMoved.contains(kingPos) || isInCheck(teamColor)) {
             return castlingMoves;
         }
-        if (isInCheck(teamColor)) {
-            return castlingMoves;
-        }
+
         int kingRow = kingPos.getRow();
         int kingCol = kingPos.getColumn();
-        // Kingside castle
+        TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+
+        // Kingside castling
         ChessPosition kingsideRookPos = new ChessPosition(kingRow, 8);
         if (!piecesMoved.contains(kingsideRookPos)) {
             ChessPiece rook = board.getPiece(kingsideRookPos);
-            if (rook != null && rook.getPieceType() == ChessPiece.PieceType.ROOK
-                    && rook.getTeamColor() == teamColor) {
-                boolean pathClear = true;
-                for (int col = kingCol + 1; col < 8; col++) {
-                    if (board.getPiece(new ChessPosition(kingRow, col)) != null) {
-                        pathClear = false;
-                        break;
-                    }
-                }
-                if (pathClear) {
-                    boolean safe = true;
-                    for (int col = kingCol + 1; col <= kingCol + 2; col++) {
-                        if (checkSquare(new ChessPosition(kingRow, col), teamColor)) {
-                            safe = false;
-                            break;
-                        }
-                    }
-                    if (safe) {
-                        castlingMoves.add(new ChessMove(kingPos, new ChessPosition(kingRow, kingCol + 2), null));
-                    }
+            if (rook != null && rook.getPieceType() == ChessPiece.PieceType.ROOK && rook.getTeamColor() == teamColor) {
+                if (isPathClear(kingRow, kingCol + 1, 7) && isPathSafe(kingRow, kingCol + 1, kingCol + 2, enemyColor)) {
+                    castlingMoves.add(new ChessMove(kingPos, new ChessPosition(kingRow, kingCol + 2), null));
                 }
             }
         }
-        // Queenside castle
+
+        // Queenside casting
         ChessPosition queensideRookPos = new ChessPosition(kingRow, 1);
         if (!piecesMoved.contains(queensideRookPos)) {
             ChessPiece rook = board.getPiece(queensideRookPos);
-            if (rook != null && rook.getPieceType() == ChessPiece.PieceType.ROOK
-                    && rook.getTeamColor() == teamColor) {
-                boolean pathClear = true;
-                for (int col = 2; col < kingCol; col++) {
-                    if (board.getPiece(new ChessPosition(kingRow, col)) != null) {
-                        pathClear = false;
-                        break;
-                    }
-                }
-                if (pathClear) {
-                    boolean safe = true;
-                    for (int col = kingCol - 1; col >= kingCol - 2; col--) {
-                        if (checkSquare(new ChessPosition(kingRow, col), teamColor)) {
-                            safe = false;
-                            break;
-                        }
-                    }
-                    if (safe) {
-                        castlingMoves.add(new ChessMove(kingPos, new ChessPosition(kingRow, kingCol - 2), null));
-                    }
+            if (rook != null && rook.getPieceType() == ChessPiece.PieceType.ROOK && rook.getTeamColor() == teamColor) {
+                if (isPathClear(kingRow, 2, kingCol - 1) && isPathSafe(kingRow, kingCol - 2, kingCol - 1, enemyColor)) {
+                    castlingMoves.add(new ChessMove(kingPos, new ChessPosition(kingRow, kingCol - 2), null));
                 }
             }
         }
@@ -401,26 +398,6 @@ public class ChessGame {
         ChessPosition capturePos = new ChessPosition(ourRow + direction, enemyCol);
         enPassantMoves.add(new ChessMove(pawnPos, capturePos, null));
         return enPassantMoves;
-    }
-
-    private boolean checkSquare(ChessPosition position, TeamColor friendlyColor) {
-        TeamColor enemyColor = (friendlyColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(pos);
-
-                if (piece != null && piece.getTeamColor() == enemyColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, pos);
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(position)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     /**
