@@ -28,13 +28,16 @@ public class BoardRenderer {
                     EscapeSequences.RESET_BG_COLOR +
                     EscapeSequences.RESET_TEXT_COLOR);
 
-            // Empty squares
+            // Fill each of the squares with their respective piece
             for (int col = 0; col < 8; col++) {
                 boolean isLightSquare = (chessRow + (whitePerspective ? col + 1 : 8 - col)) % 2 == 0;
                 String bg = isLightSquare
                         ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY
                         : EscapeSequences.SET_BG_COLOR_BLUE;
-                System.out.print(bg + "   " + EscapeSequences.RESET_BG_COLOR);
+                int chessCol = whitePerspective ? (col + 1) : (8 - col);
+                ChessPosition pos = new ChessPosition(chessRow, chessCol);
+                ChessPiece piece = board.getPiece(pos);
+                System.out.print(bg + getPieceDisplay(piece) + EscapeSequences.RESET_BG_COLOR);
             }
 
             // Right border
@@ -45,19 +48,38 @@ public class BoardRenderer {
                     EscapeSequences.RESET_TEXT_COLOR);
             System.out.println();
         }
-
         printColumnLabels(whitePerspective);
-        System.out.println("Board not yet implemented!");
     }
 
     // Method for printing the column labels based on team color
     private static void printColumnLabels(boolean whitePerspective) {
-        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_TEXT_COLOR_WHITE + "   ");
+        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK +
+                EscapeSequences.SET_TEXT_BOLD +
+                EscapeSequences.SET_TEXT_COLOR_WHITE + "   ");
         for (int col = 0; col < 8; col++) {
             int chessColumn = whitePerspective ? (col + 1) : (8 - col);
-            System.out.print(" " + COLUMN_LABELS[chessColumn - 1] + " ");
+            System.out.print(" " + COLUMN_LABELS[chessColumn - 1] + "\u2003");
         }
-        System.out.print("   " + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_BOLD_FAINT + EscapeSequences.RESET_TEXT_COLOR);
+        System.out.print("   " +
+                EscapeSequences.RESET_BG_COLOR +
+                EscapeSequences.RESET_TEXT_BOLD_FAINT +
+                EscapeSequences.RESET_TEXT_COLOR);
         System.out.println();
+    }
+
+    // Method for retrieving each piece
+    private static String getPieceDisplay(ChessPiece piece) {
+        if (piece == null) {
+            return EscapeSequences.EMPTY; // " \u2003 "
+        }
+        boolean isWhite = piece.getTeamColor() == ChessGame.TeamColor.WHITE;
+        return switch (piece.getPieceType()) {
+            case KING   -> isWhite ? EscapeSequences.WHITE_KING   : EscapeSequences.BLACK_KING;
+            case QUEEN  -> isWhite ? EscapeSequences.WHITE_QUEEN  : EscapeSequences.BLACK_QUEEN;
+            case ROOK   -> isWhite ? EscapeSequences.WHITE_ROOK   : EscapeSequences.BLACK_ROOK;
+            case BISHOP -> isWhite ? EscapeSequences.WHITE_BISHOP : EscapeSequences.BLACK_BISHOP;
+            case KNIGHT -> isWhite ? EscapeSequences.WHITE_KNIGHT : EscapeSequences.BLACK_KNIGHT;
+            case PAWN   -> isWhite ? EscapeSequences.WHITE_PAWN   : EscapeSequences.BLACK_PAWN;
+        };
     }
 }
