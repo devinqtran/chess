@@ -61,7 +61,7 @@ public class PostloginClient {
             System.out.println("Logged out successfully.");
             return State.PRELOGIN;
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Logout failed: " + getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Logout failed: " + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
             return State.POSTLOGIN;
         }
     }
@@ -77,7 +77,7 @@ public class PostloginClient {
             facade.createGame(authToken, gameName);
             System.out.println("Game '" + gameName + "' created successfully.");
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Create game failed: " + getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Create game failed: " + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
         }
         return State.POSTLOGIN;
     }
@@ -99,7 +99,7 @@ public class PostloginClient {
                 }
             }
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "List games failed: " + getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "List games failed: " + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
         }
         return State.POSTLOGIN;
     }
@@ -135,7 +135,7 @@ public class PostloginClient {
         } catch (NumberFormatException e) {
             System.out.println("Game number must be a number.");
         } catch (Exception e) {
-            System.out.println("Join game failed: " + getFriendlyError(e.getMessage()));
+            System.out.println("Join game failed: " + ClientUtil.getFriendlyError(e.getMessage()));
         }
         return State.POSTLOGIN;
     }
@@ -159,27 +159,12 @@ public class PostloginClient {
             }
 
             System.out.println("Observing game " + gameNumber);
-            BoardRenderer.render(true); // observers always see white perspective
+            BoardRenderer.render(true);
 
         } catch (NumberFormatException e) {
             System.out.println("Game number must be a number.");
         }
         return State.POSTLOGIN;
-    }
-
-    // Helper method for error handling
-    private String getFriendlyError(String rawMessage) {
-        if (rawMessage.contains("401")) {
-            return "Incorrect username or password.";
-        } else if (rawMessage.contains("403")) {
-            return "That username is already taken.";
-        } else if (rawMessage.contains("400")) {
-            return "Missing or invalid information provided.";
-        } else if (rawMessage.contains("500")) {
-            return "Something went wrong on the server. Please try again.";
-        } else {
-            return "An unexpected error occurred. Please try again.";
-        }
     }
 }
 

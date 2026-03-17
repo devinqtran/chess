@@ -61,7 +61,7 @@ public class PreloginClient {
             System.out.println("Registered and logged in as " + auth.username());
             return State.POSTLOGIN;
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Registration failed: " + getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Registration failed: " + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
             return State.PRELOGIN;
         }
     }
@@ -78,23 +78,8 @@ public class PreloginClient {
             System.out.println("Logged in as " + auth.username());
             return State.POSTLOGIN;
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Login failed: " + getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Login failed: " + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
             return State.PRELOGIN;
-        }
-    }
-
-    // Helper method for error handling
-    private String getFriendlyError(String rawMessage) {
-        if (rawMessage.contains("401")) {
-            return "Incorrect username or password.";
-        } else if (rawMessage.contains("403")) {
-            return "That username is already taken.";
-        } else if (rawMessage.contains("400")) {
-            return "Missing or invalid information provided.";
-        } else if (rawMessage.contains("500")) {
-            return "Something went wrong on the server. Please try again.";
-        } else {
-            return "An unexpected error occurred. Please try again.";
         }
     }
 
