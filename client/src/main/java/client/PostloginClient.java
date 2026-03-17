@@ -2,6 +2,8 @@ package client;
 
 import model.AuthData;
 import model.GameData;
+import ui.EscapeSequences;
+
 import java.util.Scanner;
 
 public class PostloginClient {
@@ -41,15 +43,15 @@ public class PostloginClient {
 
     // Help command method
     private void printHelp() {
-        System.out.println("""
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA + """
             Available commands:
               list                             - List all available games
-              create <name>                    - Create a new game
-              play <game number> <WHITE|BLACK> - Join a game as a player
-              observe <game number>            - Observe a game
+              create <NAME>                    - Create a new game
+              play <ID> <WHITE|BLACK>          - Join a game as a player
+              observe <ID>                     - Observe a game
               logout                           - Logout of your account
               help                             - Show this help text
-            """);
+            """ + EscapeSequences.RESET_TEXT_COLOR);
     }
 
     // Logout command method
@@ -59,7 +61,7 @@ public class PostloginClient {
             System.out.println("Logged out successfully.");
             return State.PRELOGIN;
         } catch (Exception e) {
-            System.out.println("Logout failed: " + e.getMessage());
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Logout failed: " + getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
             return State.POSTLOGIN;
         }
     }
@@ -75,7 +77,7 @@ public class PostloginClient {
             facade.createGame(authToken, gameName);
             System.out.println("Game '" + gameName + "' created successfully.");
         } catch (Exception e) {
-            System.out.println("Create game failed: " + e.getMessage());
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Create game failed: " + getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
         }
         return State.POSTLOGIN;
     }
@@ -97,7 +99,7 @@ public class PostloginClient {
                 }
             }
         } catch (Exception e) {
-            System.out.println("List games failed: " + e.getMessage());
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "List games failed: " + getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
         }
         return State.POSTLOGIN;
     }
@@ -133,7 +135,7 @@ public class PostloginClient {
         } catch (NumberFormatException e) {
             System.out.println("Game number must be a number.");
         } catch (Exception e) {
-            System.out.println("Join game failed: " + e.getMessage());
+            System.out.println("Join game failed: " + getFriendlyError(e.getMessage()));
         }
         return State.POSTLOGIN;
     }
@@ -163,6 +165,21 @@ public class PostloginClient {
             System.out.println("Game number must be a number.");
         }
         return State.POSTLOGIN;
+    }
+
+    // Helper method for error handling
+    private String getFriendlyError(String rawMessage) {
+        if (rawMessage.contains("401")) {
+            return "Incorrect username or password.";
+        } else if (rawMessage.contains("403")) {
+            return "That username is already taken.";
+        } else if (rawMessage.contains("400")) {
+            return "Missing or invalid information provided.";
+        } else if (rawMessage.contains("500")) {
+            return "Something went wrong on the server. Please try again.";
+        } else {
+            return "An unexpected error occurred. Please try again.";
+        }
     }
 }
 

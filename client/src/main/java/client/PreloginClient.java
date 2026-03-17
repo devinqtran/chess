@@ -1,6 +1,7 @@
 package client;
 
 import model.AuthData;
+import ui.EscapeSequences;
 
 import java.util.Scanner;
 
@@ -39,13 +40,13 @@ public class PreloginClient {
 
     // Helper method to define commands
     private void printHelp() {
-        System.out.println("""
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA + """
             Available commands:
-              register <username> <password> <email>  - Create a new account
-              login <username> <password>             - Login to your account
+              register <USERNAME> <PASSWORD> <EMAIL>  - Create a new account
+              login <USERNAME> <PASSWORD>             - Login to your account
               quit                                    - Exit the program
               help                                    - Show this help text
-            """);
+            """ + EscapeSequences.RESET_TEXT_COLOR);
     }
 
     // Register command method
@@ -60,7 +61,7 @@ public class PreloginClient {
             System.out.println("Registered and logged in as " + auth.username());
             return State.POSTLOGIN;
         } catch (Exception e) {
-            System.out.println("Registration failed: " + e.getMessage());
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Registration failed: " + getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
             return State.PRELOGIN;
         }
     }
@@ -77,8 +78,23 @@ public class PreloginClient {
             System.out.println("Logged in as " + auth.username());
             return State.POSTLOGIN;
         } catch (Exception e) {
-            System.out.println("Login failed: " + e.getMessage());
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Login failed: " + getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
             return State.PRELOGIN;
+        }
+    }
+
+    // Helper method for error handling
+    private String getFriendlyError(String rawMessage) {
+        if (rawMessage.contains("401")) {
+            return "Incorrect username or password.";
+        } else if (rawMessage.contains("403")) {
+            return "That username is already taken.";
+        } else if (rawMessage.contains("400")) {
+            return "Missing or invalid information provided.";
+        } else if (rawMessage.contains("500")) {
+            return "Something went wrong on the server. Please try again.";
+        } else {
+            return "An unexpected error occurred. Please try again.";
         }
     }
 

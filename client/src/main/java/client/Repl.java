@@ -1,5 +1,7 @@
 package client;
 
+import ui.EscapeSequences;
+
 import java.util.Scanner;
 
 public class Repl {
@@ -11,7 +13,7 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println("♕ Welcome to 240 Chess! Type 'help' to get started. ♕");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "♕ Welcome to 240 Chess! Type 'help' to get started. ♕" + EscapeSequences.RESET_TEXT_COLOR);
 
         PreloginClient preloginClient = new PreloginClient(facade, scanner);
 
@@ -30,6 +32,6 @@ public class Repl {
                 }
             }
         }
-        System.out.println("Goodbye!");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA + "Goodbye!" + EscapeSequences.RESET_TEXT_COLOR);
     }
 }
