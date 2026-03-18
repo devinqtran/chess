@@ -17,7 +17,7 @@ public class Repl {
 
         PreloginClient preloginClient = new PreloginClient(facade, scanner);
 
-        // Start in prelogin state loop until "quit"
+        // Prelogin state loop until "quit"
         State state = State.PRELOGIN;
         while (state != State.QUIT) {
             switch (state) {
