@@ -16,6 +16,7 @@ public class ChessGame {
     // Fields to store board and whose turn it is
     private ChessBoard board;
     private TeamColor currentTurn;
+    private boolean gameOver = false;
 
     // Tracking for en passant and castling
     private Set<ChessPosition> piecesMoved;
@@ -205,6 +206,9 @@ public class ChessGame {
     /**
      * Helper methods
      */
+    public boolean isGameOver() { return gameOver; }
+    public void setGameOver(boolean gameOver) { this.gameOver = gameOver; }
+
     private void executeMove(ChessMove move) {
         ChessPiece piece = board.getPiece(move.getStartPosition());
         board.addPiece(move.getStartPosition(), null);

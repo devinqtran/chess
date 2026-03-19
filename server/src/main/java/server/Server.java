@@ -29,6 +29,7 @@ public class Server {
     private final ListGamesHandler listGamesHandler;
     private final CreateGameHandler createGameHandler;
     private final JoinGameHandler joinGameHandler;
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         // Initialize the DB tables
