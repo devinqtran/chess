@@ -59,15 +59,72 @@ public class WebSocketHandler {
                 case CONNECT -> handleConnect(session, command, auth.username());
                 case MAKE_MOVE -> handleMakeMove(session,
                         gson.fromJson(message, MakeMoveCommand.class), auth.username());
-                case LEAVE -> System.out.println("Not yet implemented!");
-                case RESIGN -> System.out.println("Not yet implemented!");
+                case LEAVE -> handleLeave(session, command, auth.username());
+                case RESIGN -> handleResign(session, command, auth.username());
             }
         } catch (DataAccessException e) {
             sendError(session, "Error: " + e.getMessage());
         }
     }
 
-    // Helper methods
+    // Leave handler method
+    private void handleLeave(Session session, UserGameCommand command, String username) throws IOException, DataAccessException {
+        int gameID = command.getGameID();
+        GameData gameData = gameDAO.getGame(gameID);
+
+        if (gameData == null) {
+            sendError(session, "Error: game not found");
+            return;
+        }
+
+        // Check to see if a player is leaving and remove from DB
+        if (username.equals(gameData.whiteUsername())) {
+            gameDAO.updateGame(new GameData(gameData.gameID(), null,
+                    gameData.blackUsername(), gameData.gameName(), gameData.game()));
+        } else if (username.equals(gameData.blackUsername())) {
+            gameDAO.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(),
+                    null, gameData.gameName(), gameData.game()));
+        }
+
+        // Remove session from the tracking
+        sessions.removeSession(gameID, session);
+
+        // Notify the other clients
+        var notification = new NotificationMessage(username + " left the game");
+        sessions.broadcast(gameID, gson.toJson(notification), session);
+    }
+
+    // Resign handler method
+    private void handleResign(Session session, UserGameCommand command, String username) throws IOException, DataAccessException {
+        int gameID = command.getGameID();
+        GameData gameData = gameDAO.getGame(gameID);
+
+        if (gameData == null) {
+            sendError(session, "Error: game not found");
+            return;
+        }
+
+        // Make sure it is a player resigning
+        ChessGame.TeamColor playerColor = getPlayerColor(username, gameData);
+        if (playerColor == null) {
+            sendError(session, "Error: observers cannot resign");
+            return;
+        }
+
+        // Check game status
+        if (gameData.game().isGameOver()) {
+            sendError(session, "Error: the game is already over");
+            return;
+        }
+
+        // Update and mark game as over
+        gameData.game().setGameOver(true);
+        gameDAO.updateGame(gameData);
+
+        // Notify all clients
+        var notification = new NotificationMessage(username + " has resigned. Game over.");
+        sessions.broadcastAll(gameID, gson.toJson(notification));
+    }
 
     // Make move handler method
     private void handleMakeMove(Session session, MakeMoveCommand command, String username) throws IOException, DataAccessException {
