@@ -55,9 +55,21 @@ public class Server {
         listGamesHandler = new ListGamesHandler(gameService);
         createGameHandler = new CreateGameHandler(gameService);
         joinGameHandler = new JoinGameHandler(gameService);
+        webSocketHandler = new WebSocketHandler(authDAO, gameDAO);
 
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
+        });
+
+        // WebSocket endpoint
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(ctx -> {
+                ctx.enableAutomaticPings();
+                webSocketHandler.onConnect(ctx.session);
+            });
+            ws.onMessage(ctx -> webSocketHandler.onMessage(ctx.session, ctx.message()));
+            ws.onClose(ctx -> webSocketHandler.onClose(ctx.session, ctx.status(), ctx.reason()));
+            ws.onError(ctx -> webSocketHandler.onError(ctx.session, ctx.error()));
         });
 
         // Register endpoints with handler methods
