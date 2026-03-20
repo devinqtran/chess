@@ -35,10 +35,43 @@ public class GameplayClient implements NotificationHandler {
     }
 
     public State run() {
-        System.out.print("\n[IN GAME] >>> ");
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n[IN GAME] >>> " + EscapeSequences.RESET_TEXT_COLOR);
         String line = scanner.nextLine().trim();
-        System.out.println("Command coming soon: " + line);
-        return State.GAMEPLAY;
+        String[] tokens = line.split("\\s+");
+        String command = tokens[0].toLowerCase();
+
+        return switch (command) {
+            case "help" -> {
+                printHelp();
+                yield State.GAMEPLAY;
+            }
+            case "redraw" -> {
+                drawBoard();
+                yield State.GAMEPLAY;
+            }
+            case "leave" -> handleLeave();
+            case "move" -> {
+                handleMove(tokens);
+                yield State.GAMEPLAY;
+            }
+            case "resign" -> {
+                handleResign();
+                yield State.GAMEPLAY;
+            }
+            case "highlight" -> {
+                handleHighlight(tokens);
+                yield State.GAMEPLAY;
+            }
+            default -> {
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Unknown command. Type 'help' for options." + EscapeSequences.RESET_TEXT_COLOR);
+                yield State.GAMEPLAY;
+            }
+        };
+    }
+
+    private void drawBoard() {
+        boolean isWhite = !"BLACK".equals(playerColor);
+        BoardRenderer.render(currentGame, isWhite);
     }
 
     @Override
@@ -50,15 +83,44 @@ public class GameplayClient implements NotificationHandler {
                 currentGame = loadGame.getGame();
                 boolean isWhite = !"BLACK".equals(playerColor);
                 BoardRenderer.render(currentGame, isWhite);
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n[IN GAME] >>> " + EscapeSequences.RESET_TEXT_COLOR);
             }
             case NOTIFICATION -> {
                 NotificationMessage notification = gson.fromJson(message, NotificationMessage.class);
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n" + notification.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n[IN GAME] >>> " + EscapeSequences.RESET_TEXT_COLOR);
             }
             case ERROR -> {
                 ErrorMessage error = gson.fromJson(message, ErrorMessage.class);
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "\nError: " + error.getErrorMessage() + EscapeSequences.RESET_TEXT_COLOR);
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n[IN GAME] >>> " + EscapeSequences.RESET_TEXT_COLOR);
             }
         }
+    }
+
+    // Method for help command
+    private void printHelp() {
+        System.out.println("Help not yet implemented!");
+    }
+
+    // Method for leave command
+    private State handleLeave() {
+        System.out.println("Leave not yet implemented!");
+        return State.GAMEPLAY;
+    }
+
+    // Method for move command
+    private void handleMove(String[] tokens) {
+        System.out.println("Move not yet implemented!");
+    }
+
+    // Method for resign command
+    private void handleResign() {
+        System.out.println("Resign not yet implemented!");
+    }
+
+    // Method for highlight command
+    private void handleHighlight(String[] tokens) {
+        System.out.println("Highlight not yet implemented!");
     }
 }
