@@ -7,9 +7,8 @@ public class BoardRenderer {
 
     private static final String[] COLUMN_LABELS = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
-    public static void render(boolean whitePerspective) {
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
+    public static void render(ChessGame game, boolean whitePerspective) {
+        ChessBoard board = game.getBoard();
         System.out.println();
         printBoard(board, whitePerspective);
         System.out.println();

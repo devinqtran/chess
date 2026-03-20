@@ -7,8 +7,10 @@ import java.util.Scanner;
 public class Repl {
     private final ServerFacade facade;
     private final Scanner scanner = new Scanner(System.in);
+    private final int port;
 
     public Repl(int port) {
+        this.port = port;
         this.facade = new ServerFacade(port);
     }
 
@@ -23,8 +25,7 @@ public class Repl {
             switch (state) {
                 case PRELOGIN -> state = preloginClient.run();
                 case POSTLOGIN -> {
-                    PostloginClient postloginClient = new PostloginClient(facade, scanner, preloginClient.getAuthToken());
-                    // Keep looping inside postlogin until logout or quit
+                    PostloginClient postloginClient = new PostloginClient(facade, scanner, preloginClient.getAuthToken(), port);
                     while (state == State.POSTLOGIN) {
                         state = postloginClient.run();
                     }

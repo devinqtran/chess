@@ -10,16 +10,18 @@ public class PostloginClient {
     private final ServerFacade facade;
     private final Scanner scanner;
     private final String authToken;
+    private final int port;
     private GameData[] cachedGames = new GameData[0];
 
-    public PostloginClient(ServerFacade facade, Scanner scanner, String authToken) {
+    public PostloginClient(ServerFacade facade, Scanner scanner, String authToken, int port) {
         this.facade = facade;
         this.scanner = scanner;
         this.authToken = authToken;
+        this.port = port;
     }
 
     public State run() {
-        System.out.print("\n[LOGGED IN] >>> ");
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + "\n[LOGGED IN] >>> " + EscapeSequences.RESET_TEXT_COLOR);
         String line = scanner.nextLine().trim();
         String[] tokens = line.split("\\s+");
         String command = tokens[0].toLowerCase();
@@ -118,24 +120,26 @@ public class PostloginClient {
                 System.out.println("Color must be WHITE or BLACK.");
                 return State.POSTLOGIN;
             }
-            if (cachedGames.length == 0) {
-                System.out.println("Please run 'list' first to see available games.");
-                return State.POSTLOGIN;
-            }
-            if (gameNumber < 1 || gameNumber > cachedGames.length) {
-                System.out.println("Invalid game number. Please run 'list' to see available games.");
+            if (!isValidGameNumber(gameNumber)) {
                 return State.POSTLOGIN;
             }
 
             int gameID = cachedGames[gameNumber - 1].gameID();
             facade.joinGame(authToken, gameID, color);
-            System.out.println("Joined game as " + color);
-            BoardRenderer.render(color.equals("WHITE"));
+
+            // Launch gameplay
+            GameplayClient gameplayClient = new GameplayClient(
+                    facade, scanner, authToken, gameID, color, port);
+            State state = State.GAMEPLAY;
+            while (state == State.GAMEPLAY) {
+                state = gameplayClient.run();
+            }
+            return State.POSTLOGIN;
 
         } catch (NumberFormatException e) {
             System.out.println("Game number must be a number.");
         } catch (Exception e) {
-            System.out.println("Join game failed: " + ClientUtil.getFriendlyError(e.getMessage()));
+            System.out.println("Failed to join game: " + e.getMessage());
         }
         return State.POSTLOGIN;
     }
@@ -148,23 +152,44 @@ public class PostloginClient {
         }
         try {
             int gameNumber = Integer.parseInt(tokens[1]);
-
-            if (cachedGames.length == 0) {
-                System.out.println("Please run 'list' first to see available games.");
-                return State.POSTLOGIN;
-            }
-            if (gameNumber < 1 || gameNumber > cachedGames.length) {
-                System.out.println("Invalid game number. Please run 'list' to see available games.");
+            if (!isValidGameNumber(gameNumber)) {
                 return State.POSTLOGIN;
             }
 
-            System.out.println("Observing game " + gameNumber);
-            BoardRenderer.render(true);
+            int gameID = cachedGames[gameNumber - 1].gameID();
+
+            // Observers connect via WebSocket
+            GameplayClient gameplayClient = new GameplayClient(
+                    facade, scanner, authToken, gameID, "WHITE", port);
+            State state = State.GAMEPLAY;
+            while (state == State.GAMEPLAY) {
+                state = gameplayClient.run();
+            }
+            return State.POSTLOGIN;
 
         } catch (NumberFormatException e) {
             System.out.println("Game number must be a number.");
+        } catch (Exception e) {
+            System.out.println("Failed to observe game: " + e.getMessage());
         }
         return State.POSTLOGIN;
+    }
+
+    // Method for checking if a game number is valid
+    private boolean isValidGameNumber(int gameNumber) {
+        if (cachedGames.length == 0) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Please run 'list' first to see available games." +
+                    EscapeSequences.RESET_TEXT_COLOR);
+            return false;
+        }
+        if (gameNumber < 1 || gameNumber > cachedGames.length) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Invalid game number. Please run 'list' to see available games." +
+                    EscapeSequences.RESET_TEXT_COLOR);
+            return false;
+        }
+        return true;
     }
 }
 
