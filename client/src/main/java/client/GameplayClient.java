@@ -100,7 +100,35 @@ public class GameplayClient implements NotificationHandler {
 
     // Method for help command
     private void printHelp() {
-        System.out.println("Help not yet implemented!");
+        System.out.println(EscapeSequences.SET_TEXT_BOLD +
+                EscapeSequences.SET_TEXT_COLOR_YELLOW +
+                "Available commands:" +
+                EscapeSequences.RESET_TEXT_COLOR +
+                EscapeSequences.RESET_TEXT_BOLD_FAINT);
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA +
+                "  redraw" +
+                EscapeSequences.RESET_TEXT_COLOR +
+                "                   - Redraw the chess board");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA +
+                "  move <from> <to>" +
+                EscapeSequences.RESET_TEXT_COLOR +
+                "         - Make a move (e.g. move e2 e4)");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA +
+                "  highlight <square>" +
+                EscapeSequences.RESET_TEXT_COLOR +
+                "      - Highlight legal moves for a piece");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA +
+                "  resign" +
+                EscapeSequences.RESET_TEXT_COLOR +
+                "                   - Forfeit the game");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA +
+                "  leave" +
+                EscapeSequences.RESET_TEXT_COLOR +
+                "                    - Leave the game");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA +
+                "  help" +
+                EscapeSequences.RESET_TEXT_COLOR +
+                "                     - Show this help text");
     }
 
     // Method for leave command
