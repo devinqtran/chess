@@ -83,17 +83,18 @@ public class GameplayClient implements NotificationHandler {
                 currentGame = loadGame.getGame();
                 boolean isWhite = !"BLACK".equals(playerColor);
                 BoardRenderer.render(currentGame, isWhite);
-                System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n[IN GAME] >>> " + EscapeSequences.RESET_TEXT_COLOR);
             }
             case NOTIFICATION -> {
                 NotificationMessage notification = gson.fromJson(message, NotificationMessage.class);
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n" + notification.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
-                System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n[IN GAME] >>> " + EscapeSequences.RESET_TEXT_COLOR);
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW +
+                        "\n" + notification.getMessage() +
+                        EscapeSequences.RESET_TEXT_COLOR);
             }
             case ERROR -> {
                 ErrorMessage error = gson.fromJson(message, ErrorMessage.class);
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "\nError: " + error.getErrorMessage() + EscapeSequences.RESET_TEXT_COLOR);
-                System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n[IN GAME] >>> " + EscapeSequences.RESET_TEXT_COLOR);
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED +
+                        "\nError: " + error.getErrorMessage() +
+                        EscapeSequences.RESET_TEXT_COLOR);
             }
         }
     }
