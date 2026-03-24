@@ -133,8 +133,19 @@ public class GameplayClient implements NotificationHandler {
 
     // Method for leave command
     private State handleLeave() {
-        System.out.println("Leave not yet implemented!");
-        return State.GAMEPLAY;
+        try {
+            ws.leave(authToken, gameID);
+            ws.close();
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN +
+                    "You left the game." +
+                    EscapeSequences.RESET_TEXT_COLOR);
+            return State.POSTLOGIN;
+        } catch (Exception e) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Failed to leave: " + e.getMessage() +
+                    EscapeSequences.RESET_TEXT_COLOR);
+            return State.GAMEPLAY;
+        }
     }
 
     // Method for move command
