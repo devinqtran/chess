@@ -68,16 +68,11 @@ public class WebSocketHandler {
     }
 
     // Leave handler method
-    private void handleLeave(Session session, UserGameCommand command, String username) throws IOException, DataAccessException {
+    private void handleLeave(Session session, UserGameCommand command,
+                             String username) throws IOException, DataAccessException {
         int gameID = command.getGameID();
         GameData gameData = gameDAO.getGame(gameID);
 
-        if (gameData == null) {
-            sendError(session, "Error: game not found");
-            return;
-        }
-
-        // Check to see if a player is leaving and remove from DB
         if (username.equals(gameData.whiteUsername())) {
             gameDAO.updateGame(new GameData(gameData.gameID(), null,
                     gameData.blackUsername(), gameData.gameName(), gameData.game()));
@@ -85,7 +80,6 @@ public class WebSocketHandler {
             gameDAO.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(),
                     null, gameData.gameName(), gameData.game()));
         }
-
         // Remove session from the tracking
         sessions.removeSession(gameID, session);
 
