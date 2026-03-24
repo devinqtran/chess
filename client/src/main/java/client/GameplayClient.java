@@ -1,6 +1,9 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessPosition;
+import chess.ChessMove;
+import chess.ChessPiece;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ErrorMessage;
@@ -93,7 +96,7 @@ public class GameplayClient implements NotificationHandler {
             case ERROR -> {
                 ErrorMessage error = gson.fromJson(message, ErrorMessage.class);
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_RED +
-                        "\nError: " + error.getErrorMessage() +
+                        "\n" + error.getErrorMessage() +
                         EscapeSequences.RESET_TEXT_COLOR);
             }
         }
@@ -151,7 +154,36 @@ public class GameplayClient implements NotificationHandler {
 
     // Method for move command
     private void handleMove(String[] tokens) {
-        System.out.println("Move not yet implemented!");
+        if (tokens.length < 3) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Usage: move <from> <to> [promotion]  (e.g. move e2 e4)" +
+                    EscapeSequences.RESET_TEXT_COLOR);
+            return;
+        }
+        try {
+            ChessPosition from = parsePosition(tokens[1]);
+            ChessPosition to = parsePosition(tokens[2]);
+
+            // Check for promotion piece
+            ChessPiece.PieceType promotion = null;
+            if (tokens.length == 4) {
+                promotion = parsePromotion(tokens[3]);
+            }
+
+            ChessMove move = new ChessMove(from, to, promotion);
+            ws.makeMove(authToken, gameID, move);
+
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+        } catch (Exception e) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Invalid move: " + e.getMessage() +
+                    EscapeSequences.RESET_TEXT_COLOR);
+        }
     }
 
     // Method for resign command
@@ -162,5 +194,30 @@ public class GameplayClient implements NotificationHandler {
     // Method for highlight command
     private void handleHighlight(String[] tokens) {
         System.out.println("Highlight not yet implemented!");
+    }
+
+    // Helper methods for parsing position and promotion
+    private ChessPosition parsePosition(String pos) throws Exception {
+        if (pos.length() != 2) {
+            throw new Exception("Invalid position: " + pos);
+        }
+        char colChar = Character.toLowerCase(pos.charAt(0));
+        char rowChar = pos.charAt(1);
+        int col = colChar - 'a' + 1;
+        int row = rowChar - '0';
+        if (col < 1 || col > 8 || row < 1 || row > 8) {
+            throw new Exception("Position out of bounds: " + pos);
+        }
+        return new ChessPosition(row, col);
+    }
+
+    private ChessPiece.PieceType parsePromotion(String piece) throws Exception {
+        return switch (piece.toLowerCase()) {
+            case "queen", "q"  -> ChessPiece.PieceType.QUEEN;
+            case "rook", "r"   -> ChessPiece.PieceType.ROOK;
+            case "bishop", "b" -> ChessPiece.PieceType.BISHOP;
+            case "knight", "n" -> ChessPiece.PieceType.KNIGHT;
+            default -> throw new Exception("Invalid promotion piece: " + piece);
+        };
     }
 }
