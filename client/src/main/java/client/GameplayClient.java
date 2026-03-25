@@ -188,12 +188,43 @@ public class GameplayClient implements NotificationHandler {
 
     // Method for resign command
     private void handleResign() {
-        System.out.println("Resign not yet implemented!");
+        System.out.print("Are you sure you want to resign? (yes/no): ");
+        String response = scanner.nextLine().trim().toLowerCase();
+        if (response.equals("yes")) {
+            try {
+                ws.resign(authToken, gameID);
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            } catch (Exception e) {
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Resign failed: " + e.getMessage() +
+                        EscapeSequences.RESET_TEXT_COLOR);
+            }
+        } else {
+            System.out.println("Resign cancelled.");
+        }
     }
 
     // Method for highlight command
     private void handleHighlight(String[] tokens) {
-        System.out.println("Highlight not yet implemented!");
+        if (tokens.length < 2) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Usage: highlight <square>  (e.g. highlight e2)" +
+                    EscapeSequences.RESET_TEXT_COLOR);
+            return;
+        }
+        try {
+            ChessPosition pos = parsePosition(tokens[1]);
+            boolean isWhite = !"BLACK".equals(playerColor);
+            BoardRenderer.renderWithHighlights(currentGame, isWhite, pos);
+        } catch (Exception e) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Invalid square: " + e.getMessage() +
+                    EscapeSequences.RESET_TEXT_COLOR);
+        }
     }
 
     // Helper methods for parsing position and promotion

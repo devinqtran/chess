@@ -27,7 +27,6 @@ public class BoardRenderer {
                     EscapeSequences.RESET_BG_COLOR +
                     EscapeSequences.RESET_TEXT_COLOR);
 
-            // Fill each of the squares with their respective piece
             for (int col = 0; col < 8; col++) {
                 boolean isLightSquare = (chessRow + (whitePerspective ? col + 1 : 8 - col)) % 2 == 0;
                 String bg = isLightSquare
@@ -83,5 +82,69 @@ public class BoardRenderer {
             case PAWN   -> "P";
         };
         return color + " " + letter + " " + EscapeSequences.RESET_TEXT_COLOR;
+    }
+
+    // Method for rendering with highlights
+    public static void renderWithHighlights(ChessGame game, boolean whitePerspective, ChessPosition position) {
+        java.util.Collection<ChessMove> validMoves = game.validMoves(position);
+        java.util.Set<ChessPosition> highlights = new java.util.HashSet<>();
+        if (validMoves != null) {
+            for (ChessMove move : validMoves) {
+                highlights.add(move.getEndPosition());
+            }
+        }
+
+        ChessBoard board = game.getBoard();
+        System.out.println();
+        printBoardWithHighlights(board, whitePerspective, position, highlights);
+        System.out.println();
+    }
+
+    private static void printBoardWithHighlights(ChessBoard board, boolean whitePerspective,
+                                                 ChessPosition selected,
+                                                 java.util.Set<ChessPosition> highlights) {
+        printColumnLabels(whitePerspective);
+
+        for (int row = 0; row < 8; row++) {
+            int chessRow = whitePerspective ? (8 - row) : (row + 1);
+
+            // Left border
+            System.out.print(EscapeSequences.SET_BG_COLOR_BLACK +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE +
+                    EscapeSequences.SET_TEXT_BOLD +
+                    " " + chessRow + " " +
+                    EscapeSequences.RESET_BG_COLOR +
+                    EscapeSequences.RESET_TEXT_COLOR);
+
+            for (int col = 0; col < 8; col++) {
+                int chessCol = whitePerspective ? (col + 1) : (8 - col);
+                ChessPosition pos = new ChessPosition(chessRow, chessCol);
+                ChessPiece piece = board.getPiece(pos);
+                String bg;
+                if (selected != null && pos.equals(selected)) {
+                    bg = EscapeSequences.SET_BG_COLOR_YELLOW; // selected piece
+                } else if (highlights.contains(pos)) {
+                    bg = EscapeSequences.SET_BG_COLOR_GREEN;  // valid move destination
+                } else {
+                    boolean isLightSquare = (chessRow + chessCol) % 2 == 0;
+                    bg = isLightSquare
+                            ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY
+                            : EscapeSequences.SET_BG_COLOR_BLUE;
+                }
+
+                System.out.print(bg + getPieceDisplay(piece) + EscapeSequences.RESET_BG_COLOR);
+            }
+
+            // Right border
+            System.out.print(EscapeSequences.SET_BG_COLOR_BLACK +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE +
+                    EscapeSequences.SET_TEXT_BOLD +
+                    " " + chessRow + " " +
+                    EscapeSequences.RESET_BG_COLOR +
+                    EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println();
+        }
+
+        printColumnLabels(whitePerspective);
     }
 }
