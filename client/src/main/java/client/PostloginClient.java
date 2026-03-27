@@ -79,7 +79,8 @@ public class PostloginClient {
             facade.createGame(authToken, gameName);
             System.out.println("Game '" + gameName + "' created successfully.");
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Create game failed: " + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Create game failed: "
+                    + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
         }
         return State.POSTLOGIN;
     }
@@ -101,7 +102,8 @@ public class PostloginClient {
                 }
             }
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "List games failed: " + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "List games failed: "
+                    + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
         }
         return State.POSTLOGIN;
     }

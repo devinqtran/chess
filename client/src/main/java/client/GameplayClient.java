@@ -66,7 +66,8 @@ public class GameplayClient implements NotificationHandler {
                 yield State.GAMEPLAY;
             }
             default -> {
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Unknown command. Type 'help' for options." + EscapeSequences.RESET_TEXT_COLOR);
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED
+                        + "Unknown command. Type 'help' for options." + EscapeSequences.RESET_TEXT_COLOR);
                 yield State.GAMEPLAY;
             }
         };

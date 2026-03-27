@@ -61,7 +61,8 @@ public class PreloginClient {
             System.out.println("Registered and logged in as " + auth.username());
             return State.POSTLOGIN;
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Registration failed: " + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Registration failed: "
+                    + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
             return State.PRELOGIN;
         }
     }
@@ -78,7 +79,8 @@ public class PreloginClient {
             System.out.println("Logged in as " + auth.username());
             return State.POSTLOGIN;
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Login failed: " + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Login failed: "
+                    + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
             return State.PRELOGIN;
         }
     }
