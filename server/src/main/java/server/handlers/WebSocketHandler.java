@@ -164,8 +164,8 @@ public class WebSocketHandler {
         sessions.broadcastAll(gameID, gson.toJson(loadGame));
 
         // Notify others of move
-        String moveDesc = command.getMove().getStartPosition() +
-                " to " + command.getMove().getEndPosition();
+        String moveDesc = positionToString(command.getMove().getStartPosition()) +
+                " to " + positionToString(command.getMove().getEndPosition());
         var notification = new NotificationMessage(username + " moved " + moveDesc);
         sessions.broadcast(gameID, gson.toJson(notification), session);
 
@@ -235,5 +235,12 @@ public class WebSocketHandler {
     private void sendError(Session session, String message) throws IOException {
         var error = new ErrorMessage(message);
         sessions.sendToSession(session, gson.toJson(error));
+    }
+
+    // Helper method for writing chess notation
+    private String positionToString(chess.ChessPosition pos) {
+        char col = (char) ('a' + pos.getColumn() - 1);
+        int row = pos.getRow();
+        return "" + col + row;
     }
 }
