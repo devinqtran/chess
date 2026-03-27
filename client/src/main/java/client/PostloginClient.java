@@ -63,7 +63,8 @@ public class PostloginClient {
             System.out.println("Logged out successfully.");
             return State.PRELOGIN;
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Logout failed: " + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Logout failed: "
+                    + ClientUtil.getFriendlyError(e.getMessage()) + EscapeSequences.RESET_TEXT_COLOR);
             return State.POSTLOGIN;
         }
     }
